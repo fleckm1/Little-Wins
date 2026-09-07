@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Wins V5</title>
+<style>
+:root{
+ --bg:#f7f3ee;--card:#fff;--ink:#2f3437;--muted:#747a7d;--line:#e7e0d9;
+ --sage:#8fa79a;--rose:#d7ab9a;--gold:#e7d4a3;--blue:#a9bec9;--lav:#b9b0c9;
+ --green:#7e9b82;--shadow:0 8px 24px rgba(60,50,45,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.app{max-width:930px;margin:auto;padding:14px 14px 100px}
+header{background:linear-gradient(135deg,#edf3ef,#f6e9df);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin-bottom:12px}
+h1{margin:0 0 4px;font-size:30px} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:0 0 8px}
+.sub{color:var(--muted);line-height:1.45}.tiny{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border:1px solid rgba(0,0,0,.02)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+button{border:0;border-radius:999px;padding:11px 15px;font-size:14px;font-weight:700;cursor:pointer;background:#ece8e3;color:var(--ink)}
+button.primary{background:var(--sage);color:#fff}button.rose{background:var(--rose);color:#fff}button.gold{background:var(--gold);color:#4d4637}
+button.blue{background:var(--blue);color:#fff}button.lav{background:var(--lav);color:#fff}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#fff;font-family:inherit}
+textarea{min-height:72px}
+.task{display:flex;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.task input[type=checkbox]{width:auto;margin-top:3px;transform:scale(1.2)}.task .txt{flex:1}.task.done .txt{text-decoration:line-through;color:#999}
+.pill{font-size:11px;padding:4px 7px;border-radius:999px;background:#f0ece7;color:#6b6762;white-space:nowrap}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#f6f3ef;border-radius:14px;padding:10px 12px;min-width:104px}.stat b{display:block;font-size:20px}
+.progressbar{width:100%;height:10px;background:#eee8e2;border-radius:999px;overflow:hidden;margin:10px 0 6px}.progressbar>div{height:100%;background:var(--green);width:0%}
+.timer{font-size:42px;font-weight:800;margin:6px 0}.focus{font-size:20px;font-weight:800;line-height:1.3;margin-top:10px}
+.encourage{margin-top:12px;padding:13px 15px;border-radius:14px;background:#fff;border-left:5px solid var(--sage);font-weight:650}
+.smallnote{background:#faf7f3;border-radius:12px;padding:10px 12px;font-size:13px;color:#666}
+.banner{display:none;background:#edf5ee;border:1px solid #d7e5d8;padding:13px;border-radius:14px;margin-top:10px;font-weight:700;text-align:center}
+.screen{display:none}
+#navToday:checked ~ .app #today,
+#navHome:checked ~ .app #home,
+#navMeals:checked ~ .app #meals,
+#navFamily:checked ~ .app #family,
+#navLists:checked ~ .app #lists{display:block}
+.navradio{position:fixed;opacity:0;pointer-events:none}
+#navToday:checked ~ .bottomnav label[for="navToday"],
+#navHome:checked ~ .bottomnav label[for="navHome"],
+#navMeals:checked ~ .bottomnav label[for="navMeals"],
+#navFamily:checked ~ .bottomnav label[for="navFamily"],
+#navLists:checked ~ .bottomnav label[for="navLists"]{color:var(--ink);background:#f4f1ed}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10}
+.navinner{width:100%;max-width:930px;display:grid;grid-template-columns:repeat(5,1fr)}
+.navbtn{border-radius:0;background:transparent;padding:10px 4px 9px;font-size:11px;color:var(--muted);text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.navbtn span{display:block;font-size:19px;margin-bottom:2px}
+.planbox{background:linear-gradient(135deg,#eef4ef,#fff7ee);border:1px solid var(--line);border-radius:18px;padding:14px}
+.planitem{display:flex;gap:8px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.planitem:last-child{border-bottom:0}
+.addrow{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:7px}@media(max-width:700px){.addrow{grid-template-columns:1fr}}
+.listrow{display:grid;grid-template-columns:1fr auto;gap:7px}
+.sectiontabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}.sectiontabs button.active{background:var(--sage);color:#fff}
+.person{padding:13px;border-radius:16px;background:#faf7f3;border:1px solid var(--line)}
+.todayroutine{border-left:5px solid var(--sage)}
+</style>
+</head>
+<body>
+<input class="navradio" type="radio" name="nav" id="navToday" checked>
+<input class="navradio" type="radio" name="nav" id="navHome">
+<input class="navradio" type="radio" name="nav" id="navMeals">
+<input class="navradio" type="radio" name="nav" id="navFamily">
+<input class="navradio" type="radio" name="nav" id="navLists">
+<div class="app">
+<header>
+ <div class="tiny">Little Wins V5</div>
+ <h1>Home & Family, Simplified 💛</h1>
+ <div class="sub">A home-management app that remembers the routine so you don't have to.</div>
+ <div class="encourage" id="message"></div>
+</header>
+
+<section id="today" class="screen">
+ <div class="card">
+  <h2>✨ Plan My Day</h2>
+  <div class="grid">
+   <div><label class="tiny">Realistic time available</label>
+    <select id="planTime"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select>
+   </div>
+   <div><label class="tiny">Energy today</label>
+    <select id="planEnergy"><option value="low">Low — keep things afloat</option><option value="medium" selected>Medium — make progress</option><option value="high">High — productive reset</option></select>
+   </div>
+  </div>
+  <div class="row" style="margin-top:10px"><button class="primary" onclick="planMyDay()">Build my 3–5 wins</button><button onclick="clearPlan()">Clear</button></div>
+  <div class="planbox" id="dailyPlan" style="margin-top:12px"></div>
+ </div>
+
+ <div class="card">
+  <h2>📆 Due Today</h2>
+  <div class="stack" id="dueToday"></div>
+ </div>
+
+ <div class="card">
+  <h2>⚡ Focus Burst</h2>
+  <div class="row"><button onclick="setBurst(5)">5 min</button><button class="gold" onclick="setBurst(10)">10 min</button><button class="rose" onclick="setBurst(15)">15 min</button><button class="primary" onclick="pickTask()">🎯 Pick for me</button></div>
+  <div class="focus" id="focusTask">Choose a task or let me pick one.</div><div class="tiny" id="focusMeta"></div><div class="timer" id="timer">05:00</div>
+  <div class="row"><button class="primary" id="startBtn" onclick="toggleTimer()">Start</button><button onclick="resetTimer()">Reset</button><button onclick="completeFocus()">✓ Done</button></div>
+  <div class="banner" id="celebrate"></div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><h2>🌱 Today Counts</h2><div class="stats"><div class="stat"><b id="wins">0</b><span class="tiny">wins</span></div><div class="stat"><b id="minutes">0</b><span class="tiny">minutes</span></div></div><div class="progressbar"><div id="progressFill"></div></div><div class="tiny" id="goalText"></div></div>
+  <div class="card"><h2>🧭 Quick Modes</h2><div class="row"><button onclick="modePlan('low')">😮‍💨 Low energy</button><button onclick="modePlan('guest')">🚪 Guests</button><button onclick="modePlan('evening')">🌙 Evening</button><button onclick="modePlan('sunday')">📅 Sunday</button></div></div>
+ </div>
+</section>
+
+<section id="home" class="screen">
+ <div class="card">
+  <h2>🏠 Home Tasks</h2><div class="sectiontabs" id="tabs"></div><div class="stack" id="taskList"></div>
+  <div class="addrow" style="margin-top:10px"><input id="newTask" placeholder="Task"><select id="newRoom"><option>Kitchen</option><option>Living Room</option><option>Bedroom</option><option>Bathroom</option><option>Laundry</option><option>Organizing</option><option>Paperwork</option><option>Whole House</option></select><select id="newPriority"><option value="2">Normal</option><option value="3">High</option><option value="1">Low</option></select><button class="primary" onclick="addTask()">Add</button></div>
+ </div>
+
+ <div class="card">
+  <h2>🔁 Automatic Routines</h2>
+  <div class="smallnote" style="margin-bottom:10px">Daily routines automatically reset each new day. Weekly routines reset on their scheduled weekday. Once you set them up, you can simply check them off.</div>
+  <div class="stack" id="routineList"></div>
+  <div class="addrow" style="margin-top:10px">
+   <input id="routineName" placeholder="Routine">
+   <select id="routineFrequency"><option value="daily">Every day</option><option value="weekly">Weekly</option></select>
+   <select id="routineDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+   <button class="primary" onclick="addRoutine()">Add</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+   <select id="routineOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select>
+  </div>
+ </div>
+</section>
+
+<section id="meals" class="screen">
+ <div class="card"><h2>🍽️ Meal Plan</h2><div class="stack" id="mealGrid"></div><div class="row" style="margin-top:10px"><button onclick="fillEasyMeals()">Fill easy dinners</button><button onclick="clearMeals()">Clear</button></div></div>
+ <div class="grid">
+  <div class="card"><h2>🛒 Groceries</h2><div class="listrow"><input id="groceryInput" placeholder="Add item"><button class="primary" onclick="addSimple('groceries','groceryInput','groceryList')">Add</button></div><div class="stack" id="groceryList" style="margin-top:10px"></div></div>
+  <div class="card"><h2>🧻 Supplies</h2><div class="listrow"><input id="supplyInput" placeholder="Add item"><button class="primary" onclick="addSimple('supplies','supplyInput','supplyList')">Add</button></div><div class="stack" id="supplyList" style="margin-top:10px"></div></div>
+ </div>
+</section>
+
+<section id="family" class="screen">
+ <div class="grid">
+  <div class="person"><h3>🎓 Brooke</h3><div class="sub">18 • College at UT Martin</div><div class="tiny" style="margin-top:8px">Best for occasional family tasks, travel/college reminders, or things she can handle while away.</div></div>
+  <div class="person"><h3>🏡 Grace</h3><div class="sub">16 • Lives at home</div><div class="tiny" style="margin-top:8px">Nighttime barn chores are already set as a daily recurring responsibility.</div></div>
+ </div>
+
+ <div class="card" style="margin-top:12px">
+  <h2>👨‍👩‍👧 Family Assignments</h2>
+  <div class="stack" id="assignmentList"></div>
+  <div class="addrow" style="margin-top:10px"><input id="assignTask" placeholder="Task"><select id="assignOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select><input id="assignDue" type="date"><button class="primary" onclick="addAssignment()">Assign</button></div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><h2>🐾 Pet Care</h2><textarea id="petNotes" placeholder="Food, vet, meds, supplies…" oninput="saveText('petNotes')"></textarea></div>
+  <div class="card"><h2>💳 Bills / Reminders</h2><textarea id="billNotes" placeholder="Due dates, payments, follow-ups…" oninput="saveText('billNotes')"></textarea></div>
+ </div>
+</section>
+
+<section id="lists" class="screen">
+ <div class="card"><h2>🧠 Brain Dump</h2><textarea id="brainDump" placeholder="Everything you do not want to keep carrying in your head…" oninput="saveText('brainDump')"></textarea></div>
+ <div class="card"><h2>🎒 Packing Lists</h2><div class="row"><button onclick="loadPack('college')">Brooke / College</button><button onclick="loadPack('horse')">Horse Show</button><button onclick="loadPack('trip')">Trip</button></div><div class="focus" id="packTitle" style="font-size:18px">Choose a checklist.</div><div class="stack" id="packList"></div></div>
+ <div class="card"><h2>📅 Sunday Top 3</h2><input id="priority1" placeholder="1. Most important" oninput="saveText('priority1')"><input id="priority2" placeholder="2. Important" oninput="saveText('priority2')" style="margin-top:7px"><input id="priority3" placeholder="3. Helpful if possible" oninput="saveText('priority3')" style="margin-top:7px"></div>
+</section>
+</div>
+
+<div class="bottomnav"><div class="navinner">
+<label class="navbtn" for="navToday"><span>✨</span>Today</label>
+<label class="navbtn" for="navHome"><span>🏠</span>Home</label>
+<label class="navbtn" for="navMeals"><span>🍽️</span>Meals</label>
+<label class="navbtn" for="navFamily"><span>👨‍👩‍👧</span>Family</label>
+<label class="navbtn" for="navLists"><span>📝</span>Lists</label>
+</div></div>
+
+<script>
+const encouragement=["Do the task that gives you the most relief per minute.","Future-you deserves help, not a lecture.","If you are tired, choose maintenance over improvement.","One finished task is better than ten half-started ones.","Your home is allowed to look lived in.","Choose the next right thing, not every right thing.","Little wins still count on hard days."];
+
+const seedTasks=[
+['Kitchen','Clear and wipe one counter',5,2],['Kitchen','Load or unload dishwasher',10,3],['Kitchen','Throw away expired food from one fridge shelf',10,2],
+['Living Room','Put away 10 things',5,2],['Living Room','Clear one flat surface',5,2],['Living Room','Vacuum main walking path',10,2],
+['Bedroom','Make the bed',5,1],['Bedroom','Clear one nightstand',5,1],['Bedroom','Put away 10 clothing items',5,2],
+['Bathroom','Wipe sink and counter',5,2],['Bathroom','Clean toilet',5,3],['Bathroom','Gather trash',5,2],
+['Laundry','Start one load',5,3],['Laundry','Fold one basket only',10,2],['Laundry','Put away 10 items',5,2],
+['Organizing','Declutter one drawer',10,1],['Paperwork','Open and sort today’s mail',5,2],['Whole House','Collect visible trash',10,3],['Whole House','Do a 10-item reset',5,2]
+];
+
+let state=JSON.parse(localStorage.getItem('littleWinsV5')||'{}');
+if(!state.tasks)state.tasks=seedTasks.map((x,i)=>({id:i+1,room:x[0],text:x[1],min:x[2],priority:x[3],done:false}));
+if(!state.routines)state.routines=[
+{id:101,name:'Nighttime barn chores',frequency:'daily',day:'',owner:'Grace',done:false,lastReset:''},
+{id:102,name:'Bathrooms',frequency:'weekly',day:'Tuesday',owner:'Family',done:false,lastReset:''},
+{id:103,name:'Papers / mail',frequency:'weekly',day:'Wednesday',owner:'Me',done:false,lastReset:''},
+{id:104,name:'Floors',frequency:'weekly',day:'Thursday',owner:'Family',done:false,lastReset:''},
+{id:105,name:'Fridge / grocery check',frequency:'weekly',day:'Friday',owner:'Me',done:false,lastReset:''},
+{id:106,name:'One declutter zone',frequency:'weekly',day:'Saturday',owner:'Family',done:false,lastReset:''}
+];
+if(!state.assignments)state.assignments=[]; if(!state.groceries)state.groceries=[]; if(!state.supplies)state.supplies=[]; if(!state.meals)state.meals={};
+
+const now=new Date(), todayISO=now.toISOString().slice(0,10), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+if(!state.today||state.today.date!==todayISO)state.today={date:todayISO,wins:0,minutes:0};
+
+function autoResetRoutines(){
+ state.routines.forEach(r=>{
+   if(r.frequency==='daily'){
+     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+   } else if(r.frequency==='weekly' && r.day===todayName){
+     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+   }
+ });
+ save();
+}
+autoResetRoutines();
+
+let room='All',seconds=300,chosenMinutes=5,ticking=null,currentTask=null;
+
+function save(){localStorage.setItem('littleWinsV5',JSON.stringify(state))}
+function showScreen(id){
+  var map={today:'navToday',home:'navHome',meals:'navMeals',family:'navFamily',lists:'navLists'};
+  var radio=document.getElementById(map[id]);
+  if(radio){ radio.checked=true; }
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+}
+function message(){document.getElementById('message').textContent=encouragement[Math.floor(Math.random()*encouragement.length)]}
+function celebrate(t){let b=document.getElementById('celebrate');b.textContent=t;b.style.display='block'}
+function setBurst(min){chosenMinutes=min;seconds=min*60;updateTimer()}
+function updateTimer(){let m=Math.floor(seconds/60).toString().padStart(2,'0'),s=(seconds%60).toString().padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+function toggleTimer(){let b=document.getElementById('startBtn');if(ticking){clearInterval(ticking);ticking=null;b.textContent='Start';return}b.textContent='Pause';ticking=setInterval(()=>{seconds--;updateTimer();if(seconds<=0){clearInterval(ticking);ticking=null;b.textContent='Start';celebrate('Timer finished. You may stop now — that counts.')}},1000)}
+function resetTimer(){if(ticking){clearInterval(ticking);ticking=null}seconds=chosenMinutes*60;updateTimer();document.getElementById('startBtn').textContent='Start'}
+function quickFocus(text,min){currentTask=null;chosenMinutes=min;seconds=min*60;updateTimer();document.getElementById('focusTask').textContent=text;document.getElementById('focusMeta').textContent=`About ${min} minutes`;showScreen('today')}
+function completeFocus(){if(currentTask&&currentTask.type==='task'){let t=state.tasks.find(x=>x.id===currentTask.id);if(t)t.done=true}state.today.wins++;state.today.minutes+=chosenMinutes;celebrate(encouragement[Math.floor(Math.random()*encouragement.length)]);render()}
+function pickTask(){let pool=state.tasks.filter(t=>!t.done&&t.min<=chosenMinutes).map(t=>({...t,type:'task'}));if(!pool.length)pool=state.tasks.filter(t=>!t.done).map(t=>({...t,type:'task'}));pool.sort((a,b)=>b.priority-a.priority||a.min-b.min);if(!pool.length)return celebrate('Your backlog is clear.');currentTask=pool[0];document.getElementById('focusTask').textContent=currentTask.text;document.getElementById('focusMeta').textContent=`${currentTask.room} • ${currentTask.min} min`;setBurst(currentTask.min)}
+
+function dueCandidates(){
+ let arr=[];
+ state.routines.forEach(r=>{
+   if(!r.done && (r.frequency==='daily'||r.day===todayName)) arr.push({id:'r'+r.id,text:r.name,room:`${r.owner} • recurring`,min:r.name.toLowerCase().includes('barn')?15:10,priority:3,type:'routine',sourceId:r.id});
+ });
+ state.assignments.forEach(a=>{
+   if(!a.done && a.due && a.due<=todayISO) arr.push({id:'a'+a.id,text:a.text,room:`${a.owner} • due`,min:10,priority:3,type:'assignment',sourceId:a.id});
+ });
+ return arr;
+}
+function renderDueToday(){
+ let items=dueCandidates(),el=document.getElementById('dueToday');
+ if(!items.length){el.innerHTML='<div class="tiny">Nothing recurring or assigned is due today.</div>';return}
+ el.innerHTML=items.map(x=>`<div class="task todayroutine"><div class="txt"><b>${x.text}</b><div class="tiny">${x.room}</div></div><button onclick="quickFocus('${x.text.replace(/'/g,"\\'")}',${x.min})">Start</button></div>`).join('');
+}
+function planMyDay(){
+ let max=parseInt(document.getElementById('planTime').value),energy=document.getElementById('planEnergy').value;
+ let candidates=dueCandidates();
+ state.tasks.filter(t=>!t.done).forEach(t=>candidates.push({...t,room:t.room,type:'task',score:t.priority*4+(t.min<=10?2:0)}));
+ candidates.forEach(t=>{if(t.score==null)t.score=14});
+ if(energy==='low')candidates=candidates.filter(t=>t.min<=10||t.type==='routine');
+ if(energy==='high')candidates.forEach(t=>t.score+=1);
+ candidates.sort((a,b)=>b.score-a.score||a.min-b.min);
+ let total=0,chosen=[];
+ for(let t of candidates){if(chosen.length>=5)break;if(total+t.min<=max){chosen.push(t);total+=t.min}}
+ if(chosen.length<3){for(let t of candidates){if(chosen.some(x=>x.id===t.id))continue;if(chosen.length>=3)break;chosen.push(t)}}
+ state.dailyPlan=chosen;save();renderDailyPlan();
+}
+function renderDailyPlan(){
+ let box=document.getElementById('dailyPlan'),p=state.dailyPlan||[];
+ if(!p.length){box.innerHTML='<div class="tiny">Choose your time and energy, then let Little Wins narrow the day for you.</div>';return}
+ box.innerHTML=p.map((t,i)=>`<div class="planitem"><div class="pill">${i+1}</div><div style="flex:1"><b>${t.text}</b><div class="tiny">${t.room||'Task'} • ~${t.min||10} min</div></div><button onclick="quickFocus('${t.text.replace(/'/g,"\\'")}',${t.min||10})">Start</button></div>`).join('');
+}
+function clearPlan(){state.dailyPlan=[];save();renderDailyPlan()}
+function modePlan(mode){
+ const modes={low:[['Collect visible trash',5],['Contain dishes',5],['Move laundry one step',5]],guest:[['Collect visible trash',5],['Clear entry and walking path',5],['Wipe bathroom sink/toilet',10],['Clear couch/main surface',10]],evening:[['Load/run dishwasher',10],['Set out tomorrow essentials',5],['Move laundry forward',5],['Check Grace barn chores',2]],sunday:[['Check calendar',10],['Pick dinners',10],['Review bills',10],['Choose top 3 priorities',5]]};
+ state.dailyPlan=modes[mode].map((x,i)=>({id:'m'+i,text:x[0],room:'Quick Mode',min:x[1]}));save();renderDailyPlan()
+}
+
+function rooms(){return ['All','Kitchen','Living Room','Bedroom','Bathroom','Laundry','Organizing','Paperwork','Whole House']}
+function renderTabs(){document.getElementById('tabs').innerHTML=rooms().map(r=>`<button class="${r===room?'active':''}" onclick="room='${r}';renderTasks();renderTabs()">${r}</button>`).join('')}
+function renderTasks(){let list=state.tasks.filter(t=>room==='All'||t.room===room);document.getElementById('taskList').innerHTML=list.map(t=>`<div class="task ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id},this.checked)"><div class="txt">${t.text}<div class="tiny">${t.room} • ${t.min} min • ${t.priority===3?'High':t.priority===1?'Low':'Normal'}</div></div></div>`).join('')}
+function toggleTask(id,done){let t=state.tasks.find(x=>x.id===id);if(done&&!t.done){state.today.wins++;state.today.minutes+=t.min}t.done=done;render()}
+function addTask(){let txt=document.getElementById('newTask').value.trim();if(!txt)return;state.tasks.push({id:Date.now(),room:document.getElementById('newRoom').value,text:txt,min:10,priority:parseInt(document.getElementById('newPriority').value),done:false});document.getElementById('newTask').value='';render()}
+
+function renderRoutines(){
+ document.getElementById('routineList').innerHTML=state.routines.map(r=>`<div class="task ${r.done?'done':''}"><input type="checkbox" ${r.done?'checked':''} onchange="toggleRoutine(${r.id},this.checked)"><div class="txt"><b>${r.name}</b><div class="tiny">${r.frequency==='daily'?'Every day':r.day+'s'} • ${r.owner} • auto-resets</div></div><button onclick="deleteRoutine(${r.id})">Delete</button></div>`).join('')
+}
+function addRoutine(){
+ let n=document.getElementById('routineName').value.trim();if(!n)return;
+ let f=document.getElementById('routineFrequency').value;
+ state.routines.push({id:Date.now(),name:n,frequency:f,day:f==='weekly'?document.getElementById('routineDay').value:'',owner:document.getElementById('routineOwner').value,done:false,lastReset:todayISO});
+ document.getElementById('routineName').value='';render()
+}
+function toggleRoutine(id,done){let r=state.routines.find(x=>x.id===id);r.done=done;if(done){state.today.wins++}save();render()}
+function deleteRoutine(id){state.routines=state.routines.filter(x=>x.id!==id);render()}
+
+function renderAssignments(){document.getElementById('assignmentList').innerHTML=state.assignments.map(a=>`<div class="task ${a.done?'done':''}"><input type="checkbox" ${a.done?'checked':''} onchange="toggleAssignment(${a.id},this.checked)"><div class="txt"><b>${a.text}</b><div class="tiny">${a.owner}${a.due?' • due '+a.due:''}</div></div></div>`).join('')}
+function addAssignment(){let t=document.getElementById('assignTask').value.trim();if(!t)return;state.assignments.push({id:Date.now(),text:t,owner:document.getElementById('assignOwner').value,due:document.getElementById('assignDue').value,done:false});document.getElementById('assignTask').value='';render()}
+function toggleAssignment(id,done){let a=state.assignments.find(x=>x.id===id);a.done=done;if(done)state.today.wins++;save();render()}
+
+function addSimple(key,inputId,listId){let v=document.getElementById(inputId).value.trim();if(!v)return;state[key].push({id:Date.now(),text:v,done:false});document.getElementById(inputId).value='';render()}
+function renderSimple(key,listId){document.getElementById(listId).innerHTML=state[key].map(x=>`<div class="task ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleSimple('${key}',${x.id},this.checked)"><div class="txt">${x.text}</div></div>`).join('')}
+function toggleSimple(key,id,done){let x=state[key].find(a=>a.id===id);x.done=done;save();renderSimple(key,key==='groceries'?'groceryList':'supplyList')}
+
+const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function renderMeals(){document.getElementById('mealGrid').innerHTML=days.map(d=>`<div class="task"><div class="pill">${d.slice(0,3)}</div><input value="${(state.meals[d]||'').replace(/"/g,'&quot;')}" oninput="state.meals['${d}']=this.value;save()" placeholder="Dinner"></div>`).join('')}
+function fillEasyMeals(){let ideas=['Tacos / taco bowls','Sheet-pan chicken','Breakfast for dinner','Pasta + salad','Rotisserie chicken + sides','Soup + sandwiches','Leftovers / fend-for-yourself'];days.forEach((d,i)=>state.meals[d]=ideas[i]);render();save()}
+function clearMeals(){state.meals={};render();save()}
+function saveText(id){state[id]=document.getElementById(id).value;save()}
+function loadText(){['petNotes','billNotes','brainDump','priority1','priority2','priority3'].forEach(id=>{if(state[id])document.getElementById(id).value=state[id]})}
+
+const packs={
+ college:['Laptop / charger','Student ID / wallet','Medications','Class materials','Laundry / clothes','Toiletries','Dorm supplies','Important forms / documents','Anything to send back to UT Martin'],
+ horse:['Show clothes','Boots / hat / belt','Horse paperwork','Tack / pads','Grooming supplies','Feed / supplements','Buckets / hay bag','Cooler / chairs','Chargers'],
+ trip:['Wallet / ID','Medications','Phone / charger','Clothes','Toiletries','Pet needs','Snacks / drinks','Reservations']
+};
+function loadPack(type){let titles={college:'🎓 Brooke / UT Martin',horse:'🐴 Horse Show',trip:'🚗 Trip'};document.getElementById('packTitle').textContent=titles[type];document.getElementById('packList').innerHTML=packs[type].map(x=>`<label class="task"><input type="checkbox"><div class="txt">${x}</div></label>`).join('')}
+
+function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;document.getElementById('wins').textContent=w;document.getElementById('minutes').textContent=m;document.getElementById('progressFill').style.width=Math.min(100,w/5*100)+'%';document.getElementById('goalText').textContent=w>=5?'You reached today’s goal. Anything else is bonus.':`${w} of 5 little wins — five is enough.`}
+function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();save()}
+
+message();render();updateTimer();loadText();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Wins V5</title>
+<style>
+:root{
+ --bg:#f7f3ee;--card:#fff;--ink:#2f3437;--muted:#747a7d;--line:#e7e0d9;
+ --sage:#8fa79a;--rose:#d7ab9a;--gold:#e7d4a3;--blue:#a9bec9;--lav:#b9b0c9;
+ --green:#7e9b82;--shadow:0 8px 24px rgba(60,50,45,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.app{max-width:930px;margin:auto;padding:14px 14px 100px}
+header{background:linear-gradient(135deg,#edf3ef,#f6e9df);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin-bottom:12px}
+h1{margin:0 0 4px;font-size:30px} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:0 0 8px}
+.sub{color:var(--muted);line-height:1.45}.tiny{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border:1px solid rgba(0,0,0,.02)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+button{border:0;border-radius:999px;padding:11px 15px;font-size:14px;font-weight:700;cursor:pointer;background:#ece8e3;color:var(--ink)}
+button.primary{background:var(--sage);color:#fff}button.rose{background:var(--rose);color:#fff}button.gold{background:var(--gold);color:#4d4637}
+button.blue{background:var(--blue);color:#fff}button.lav{background:var(--lav);color:#fff}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#fff;font-family:inherit}
+textarea{min-height:72px}
+.task{display:flex;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.task input[type=checkbox]{width:auto;margin-top:3px;transform:scale(1.2)}.task .txt{flex:1}.task.done .txt{text-decoration:line-through;color:#999}
+.pill{font-size:11px;padding:4px 7px;border-radius:999px;background:#f0ece7;color:#6b6762;white-space:nowrap}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#f6f3ef;border-radius:14px;padding:10px 12px;min-width:104px}.stat b{display:block;font-size:20px}
+.progressbar{width:100%;height:10px;background:#eee8e2;border-radius:999px;overflow:hidden;margin:10px 0 6px}.progressbar>div{height:100%;background:var(--green);width:0%}
+.timer{font-size:42px;font-weight:800;margin:6px 0}.focus{font-size:20px;font-weight:800;line-height:1.3;margin-top:10px}
+.encourage{margin-top:12px;padding:13px 15px;border-radius:14px;background:#fff;border-left:5px solid var(--sage);font-weight:650}
+.smallnote{background:#faf7f3;border-radius:12px;padding:10px 12px;font-size:13px;color:#666}
+.banner{display:none;background:#edf5ee;border:1px solid #d7e5d8;padding:13px;border-radius:14px;margin-top:10px;font-weight:700;text-align:center}
+.screen{display:none}
+#navToday:checked ~ .app #today,
+#navHome:checked ~ .app #home,
+#navMeals:checked ~ .app #meals,
+#navFamily:checked ~ .app #family,
+#navLists:checked ~ .app #lists{display:block}
+.navradio{position:fixed;opacity:0;pointer-events:none}
+#navToday:checked ~ .bottomnav label[for="navToday"],
+#navHome:checked ~ .bottomnav label[for="navHome"],
+#navMeals:checked ~ .bottomnav label[for="navMeals"],
+#navFamily:checked ~ .bottomnav label[for="navFamily"],
+#navLists:checked ~ .bottomnav label[for="navLists"]{color:var(--ink);background:#f4f1ed}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10}
+.navinner{width:100%;max-width:930px;display:grid;grid-template-columns:repeat(5,1fr)}
+.navbtn{border-radius:0;background:transparent;padding:10px 4px 9px;font-size:11px;color:var(--muted);text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.navbtn span{display:block;font-size:19px;margin-bottom:2px}
+.planbox{background:linear-gradient(135deg,#eef4ef,#fff7ee);border:1px solid var(--line);border-radius:18px;padding:14px}
+.planitem{display:flex;gap:8px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.planitem:last-child{border-bottom:0}
+.addrow{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:7px}@media(max-width:700px){.addrow{grid-template-columns:1fr}}
+.listrow{display:grid;grid-template-columns:1fr auto;gap:7px}
+.sectiontabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}.sectiontabs button.active{background:var(--sage);color:#fff}
+.person{padding:13px;border-radius:16px;background:#faf7f3;border:1px solid var(--line)}
+.todayroutine{border-left:5px solid var(--sage)}
+</style>
+</head>
+<body>
+<input class="navradio" type="radio" name="nav" id="navToday" checked>
+<input class="navradio" type="radio" name="nav" id="navHome">
+<input class="navradio" type="radio" name="nav" id="navMeals">
+<input class="navradio" type="radio" name="nav" id="navFamily">
+<input class="navradio" type="radio" name="nav" id="navLists">
+<div class="app">
+<header>
+ <div class="tiny">Little Wins V5</div>
+ <h1>Home & Family, Simplified 💛</h1>
+ <div class="sub">A home-management app that remembers the routine so you don't have to.</div>
+ <div class="encourage" id="message"></div>
+</header>
+
+<section id="today" class="screen">
+ <div class="card">
+  <h2>✨ Plan My Day</h2>
+  <div class="grid">
+   <div><label class="tiny">Realistic time available</label>
+    <select id="planTime"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select>
+   </div>
+   <div><label class="tiny">Energy today</label>
+    <select id="planEnergy"><option value="low">Low — keep things afloat</option><option value="medium" selected>Medium — make progress</option><option value="high">High — productive reset</option></select>
+   </div>
+  </div>
+  <div class="row" style="margin-top:10px"><button class="primary" onclick="planMyDay()">Build my 3–5 wins</button><button onclick="clearPlan()">Clear</button></div>
+  <div class="planbox" id="dailyPlan" style="margin-top:12px"></div>
+ </div>
+
+ <div class="card">
+  <h2>📆 Due Today</h2>
+  <div class="stack" id="dueToday"></div>
+ </div>
+
+ <div class="card">
+  <h2>⚡ Focus Burst</h2>
+  <div class="row"><button onclick="setBurst(5)">5 min</button><button class="gold" onclick="setBurst(10)">10 min</button><button class="rose" onclick="setBurst(15)">15 min</button><button class="primary" onclick="pickTask()">🎯 Pick for me</button></div>
+  <div class="focus" id="focusTask">Choose a task or let me pick one.</div><div class="tiny" id="focusMeta"></div><div class="timer" id="timer">05:00</div>
+  <div class="row"><button class="primary" id="startBtn" onclick="toggleTimer()">Start</button><button onclick="resetTimer()">Reset</button><button onclick="completeFocus()">✓ Done</button></div>
+  <div class="banner" id="celebrate"></div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><h2>🌱 Today Counts</h2><div class="stats"><div class="stat"><b id="wins">0</b><span class="tiny">wins</span></div><div class="stat"><b id="minutes">0</b><span class="tiny">minutes</span></div></div><div class="progressbar"><div id="progressFill"></div></div><div class="tiny" id="goalText"></div></div>
+  <div class="card"><h2>🧭 Quick Modes</h2><div class="row"><button onclick="modePlan('low')">😮‍💨 Low energy</button><button onclick="modePlan('guest')">🚪 Guests</button><button onclick="modePlan('evening')">🌙 Evening</button><button onclick="modePlan('sunday')">📅 Sunday</button></div></div>
+ </div>
+</section>
+
+<section id="home" class="screen">
+ <div class="card">
+  <h2>🏠 Home Tasks</h2><div class="sectiontabs" id="tabs"></div><div class="stack" id="taskList"></div>
+  <div class="addrow" style="margin-top:10px"><input id="newTask" placeholder="Task"><select id="newRoom"><option>Kitchen</option><option>Living Room</option><option>Bedroom</option><option>Bathroom</option><option>Laundry</option><option>Organizing</option><option>Paperwork</option><option>Whole House</option></select><select id="newPriority"><option value="2">Normal</option><option value="3">High</option><option value="1">Low</option></select><button class="primary" onclick="addTask()">Add</button></div>
+ </div>
+
+ <div class="card">
+  <h2>🔁 Automatic Routines</h2>
+  <div class="smallnote" style="margin-bottom:10px">Daily routines automatically reset each new day. Weekly routines reset on their scheduled weekday. Once you set them up, you can simply check them off.</div>
+  <div class="stack" id="routineList"></div>
+  <div class="addrow" style="margin-top:10px">
+   <input id="routineName" placeholder="Routine">
+   <select id="routineFrequency"><option value="daily">Every day</option><option value="weekly">Weekly</option></select>
+   <select id="routineDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+   <button class="primary" onclick="addRoutine()">Add</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+   <select id="routineOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select>
+  </div>
+ </div>
+</section>
+
+<section id="meals" class="screen">
+ <div class="card"><h2>🍽️ Meal Plan</h2><div class="stack" id="mealGrid"></div><div class="row" style="margin-top:10px"><button onclick="fillEasyMeals()">Fill easy dinners</button><button onclick="clearMeals()">Clear</button></div></div>
+ <div class="grid">
+  <div class="card"><h2>🛒 Groceries</h2><div class="listrow"><input id="groceryInput" placeholder="Add item"><button class="primary" onclick="addSimple('groceries','groceryInput','groceryList')">Add</button></div><div class="stack" id="groceryList" style="margin-top:10px"></div></div>
+  <div class="card"><h2>🧻 Supplies</h2><div class="listrow"><input id="supplyInput" placeholder="Add item"><button class="primary" onclick="addSimple('supplies','supplyInput','supplyList')">Add</button></div><div class="stack" id="supplyList" style="margin-top:10px"></div></div>
+ </div>
+</section>
+
+<section id="family" class="screen">
+ <div class="grid">
+  <div class="person"><h3>🎓 Brooke</h3><div class="sub">18 • College at UT Martin</div><div class="tiny" style="margin-top:8px">Best for occasional family tasks, travel/college reminders, or things she can handle while away.</div></div>
+  <div class="person"><h3>🏡 Grace</h3><div class="sub">16 • Lives at home</div><div class="tiny" style="margin-top:8px">Nighttime barn chores are already set as a daily recurring responsibility.</div></div>
+ </div>
+
+ <div class="card" style="margin-top:12px">
+  <h2>👨‍👩‍👧 Family Assignments</h2>
+  <div class="stack" id="assignmentList"></div>
+  <div class="addrow" style="margin-top:10px"><input id="assignTask" placeholder="Task"><select id="assignOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select><input id="assignDue" type="date"><button class="primary" onclick="addAssignment()">Assign</button></div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><h2>🐾 Pet Care</h2><textarea id="petNotes" placeholder="Food, vet, meds, supplies…" oninput="saveText('petNotes')"></textarea></div>
+  <div class="card"><h2>💳 Bills / Reminders</h2><textarea id="billNotes" placeholder="Due dates, payments, follow-ups…" oninput="saveText('billNotes')"></textarea></div>
+ </div>
+</section>
+
+<section id="lists" class="screen">
+ <div class="card"><h2>🧠 Brain Dump</h2><textarea id="brainDump" placeholder="Everything you do not want to keep carrying in your head…" oninput="saveText('brainDump')"></textarea></div>
+ <div class="card"><h2>🎒 Packing Lists</h2><div class="row"><button onclick="loadPack('college')">Brooke / College</button><button onclick="loadPack('horse')">Horse Show</button><button onclick="loadPack('trip')">Trip</button></div><div class="focus" id="packTitle" style="font-size:18px">Choose a checklist.</div><div class="stack" id="packList"></div></div>
+ <div class="card"><h2>📅 Sunday Top 3</h2><input id="priority1" placeholder="1. Most important" oninput="saveText('priority1')"><input id="priority2" placeholder="2. Important" oninput="saveText('priority2')" style="margin-top:7px"><input id="priority3" placeholder="3. Helpful if possible" oninput="saveText('priority3')" style="margin-top:7px"></div>
+</section>
+</div>
+
+<div class="bottomnav"><div class="navinner">
+<label class="navbtn" for="navToday"><span>✨</span>Today</label>
+<label class="navbtn" for="navHome"><span>🏠</span>Home</label>
+<label class="navbtn" for="navMeals"><span>🍽️</span>Meals</label>
+<label class="navbtn" for="navFamily"><span>👨‍👩‍👧</span>Family</label>
+<label class="navbtn" for="navLists"><span>📝</span>Lists</label>
+</div></div>
+
+<script>
+const encouragement=["Do the task that gives you the most relief per minute.","Future-you deserves help, not a lecture.","If you are tired, choose maintenance over improvement.","One finished task is better than ten half-started ones.","Your home is allowed to look lived in.","Choose the next right thing, not every right thing.","Little wins still count on hard days."];
+
+const seedTasks=[
+['Kitchen','Clear and wipe one counter',5,2],['Kitchen','Load or unload dishwasher',10,3],['Kitchen','Throw away expired food from one fridge shelf',10,2],
+['Living Room','Put away 10 things',5,2],['Living Room','Clear one flat surface',5,2],['Living Room','Vacuum main walking path',10,2],
+['Bedroom','Make the bed',5,1],['Bedroom','Clear one nightstand',5,1],['Bedroom','Put away 10 clothing items',5,2],
+['Bathroom','Wipe sink and counter',5,2],['Bathroom','Clean toilet',5,3],['Bathroom','Gather trash',5,2],
+['Laundry','Start one load',5,3],['Laundry','Fold one basket only',10,2],['Laundry','Put away 10 items',5,2],
+['Organizing','Declutter one drawer',10,1],['Paperwork','Open and sort today’s mail',5,2],['Whole House','Collect visible trash',10,3],['Whole House','Do a 10-item reset',5,2]
+];
+
+let state=JSON.parse(localStorage.getItem('littleWinsV5')||'{}');
+if(!state.tasks)state.tasks=seedTasks.map((x,i)=>({id:i+1,room:x[0],text:x[1],min:x[2],priority:x[3],done:false}));
+if(!state.routines)state.routines=[
+{id:101,name:'Nighttime barn chores',frequency:'daily',day:'',owner:'Grace',done:false,lastReset:''},
+{id:102,name:'Bathrooms',frequency:'weekly',day:'Tuesday',owner:'Family',done:false,lastReset:''},
+{id:103,name:'Papers / mail',frequency:'weekly',day:'Wednesday',owner:'Me',done:false,lastReset:''},
+{id:104,name:'Floors',frequency:'weekly',day:'Thursday',owner:'Family',done:false,lastReset:''},
+{id:105,name:'Fridge / grocery check',frequency:'weekly',day:'Friday',owner:'Me',done:false,lastReset:''},
+{id:106,name:'One declutter zone',frequency:'weekly',day:'Saturday',owner:'Family',done:false,lastReset:''}
+];
+if(!state.assignments)state.assignments=[]; if(!state.groceries)state.groceries=[]; if(!state.supplies)state.supplies=[]; if(!state.meals)state.meals={};
+
+const now=new Date(), todayISO=now.toISOString().slice(0,10), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+if(!state.today||state.today.date!==todayISO)state.today={date:todayISO,wins:0,minutes:0};
+
+function autoResetRoutines(){
+ state.routines.forEach(r=>{
+   if(r.frequency==='daily'){
+     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+   } else if(r.frequency==='weekly' && r.day===todayName){
+     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+   }
+ });
+ save();
+}
+autoResetRoutines();
+
+let room='All',seconds=300,chosenMinutes=5,ticking=null,currentTask=null;
+
+function save(){localStorage.setItem('littleWinsV5',JSON.stringify(state))}
+function showScreen(id){
+  var map={today:'navToday',home:'navHome',meals:'navMeals',family:'navFamily',lists:'navLists'};
+  var radio=document.getElementById(map[id]);
+  if(radio){ radio.checked=true; }
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+}
+function message(){document.getElementById('message').textContent=encouragement[Math.floor(Math.random()*encouragement.length)]}
+function celebrate(t){let b=document.getElementById('celebrate');b.textContent=t;b.style.display='block'}
+function setBurst(min){chosenMinutes=min;seconds=min*60;updateTimer()}
+function updateTimer(){let m=Math.floor(seconds/60).toString().padStart(2,'0'),s=(seconds%60).toString().padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+function toggleTimer(){let b=document.getElementById('startBtn');if(ticking){clearInterval(ticking);ticking=null;b.textContent='Start';return}b.textContent='Pause';ticking=setInterval(()=>{seconds--;updateTimer();if(seconds<=0){clearInterval(ticking);ticking=null;b.textContent='Start';celebrate('Timer finished. You may stop now — that counts.')}},1000)}
+function resetTimer(){if(ticking){clearInterval(ticking);ticking=null}seconds=chosenMinutes*60;updateTimer();document.getElementById('startBtn').textContent='Start'}
+function quickFocus(text,min){currentTask=null;chosenMinutes=min;seconds=min*60;updateTimer();document.getElementById('focusTask').textContent=text;document.getElementById('focusMeta').textContent=`About ${min} minutes`;showScreen('today')}
+function completeFocus(){if(currentTask&&currentTask.type==='task'){let t=state.tasks.find(x=>x.id===currentTask.id);if(t)t.done=true}state.today.wins++;state.today.minutes+=chosenMinutes;celebrate(encouragement[Math.floor(Math.random()*encouragement.length)]);render()}
+function pickTask(){let pool=state.tasks.filter(t=>!t.done&&t.min<=chosenMinutes).map(t=>({...t,type:'task'}));if(!pool.length)pool=state.tasks.filter(t=>!t.done).map(t=>({...t,type:'task'}));pool.sort((a,b)=>b.priority-a.priority||a.min-b.min);if(!pool.length)return celebrate('Your backlog is clear.');currentTask=pool[0];document.getElementById('focusTask').textContent=currentTask.text;document.getElementById('focusMeta').textContent=`${currentTask.room} • ${currentTask.min} min`;setBurst(currentTask.min)}
+
+function dueCandidates(){
+ let arr=[];
+ state.routines.forEach(r=>{
+   if(!r.done && (r.frequency==='daily'||r.day===todayName)) arr.push({id:'r'+r.id,text:r.name,room:`${r.owner} • recurring`,min:r.name.toLowerCase().includes('barn')?15:10,priority:3,type:'routine',sourceId:r.id});
+ });
+ state.assignments.forEach(a=>{
+   if(!a.done && a.due && a.due<=todayISO) arr.push({id:'a'+a.id,text:a.text,room:`${a.owner} • due`,min:10,priority:3,type:'assignment',sourceId:a.id});
+ });
+ return arr;
+}
+function renderDueToday(){
+ let items=dueCandidates(),el=document.getElementById('dueToday');
+ if(!items.length){el.innerHTML='<div class="tiny">Nothing recurring or assigned is due today.</div>';return}
+ el.innerHTML=items.map(x=>`<div class="task todayroutine"><div class="txt"><b>${x.text}</b><div class="tiny">${x.room}</div></div><button onclick="quickFocus('${x.text.replace(/'/g,"\\'")}',${x.min})">Start</button></div>`).join('');
+}
+function planMyDay(){
+ let max=parseInt(document.getElementById('planTime').value),energy=document.getElementById('planEnergy').value;
+ let candidates=dueCandidates();
+ state.tasks.filter(t=>!t.done).forEach(t=>candidates.push({...t,room:t.room,type:'task',score:t.priority*4+(t.min<=10?2:0)}));
+ candidates.forEach(t=>{if(t.score==null)t.score=14});
+ if(energy==='low')candidates=candidates.filter(t=>t.min<=10||t.type==='routine');
+ if(energy==='high')candidates.forEach(t=>t.score+=1);
+ candidates.sort((a,b)=>b.score-a.score||a.min-b.min);
+ let total=0,chosen=[];
+ for(let t of candidates){if(chosen.length>=5)break;if(total+t.min<=max){chosen.push(t);total+=t.min}}
+ if(chosen.length<3){for(let t of candidates){if(chosen.some(x=>x.id===t.id))continue;if(chosen.length>=3)break;chosen.push(t)}}
+ state.dailyPlan=chosen;save();renderDailyPlan();
+}
+function renderDailyPlan(){
+ let box=document.getElementById('dailyPlan'),p=state.dailyPlan||[];
+ if(!p.length){box.innerHTML='<div class="tiny">Choose your time and energy, then let Little Wins narrow the day for you.</div>';return}
+ box.innerHTML=p.map((t,i)=>`<div class="planitem"><div class="pill">${i+1}</div><div style="flex:1"><b>${t.text}</b><div class="tiny">${t.room||'Task'} • ~${t.min||10} min</div></div><button onclick="quickFocus('${t.text.replace(/'/g,"\\'")}',${t.min||10})">Start</button></div>`).join('');
+}
+function clearPlan(){state.dailyPlan=[];save();renderDailyPlan()}
+function modePlan(mode){
+ const modes={low:[['Collect visible trash',5],['Contain dishes',5],['Move laundry one step',5]],guest:[['Collect visible trash',5],['Clear entry and walking path',5],['Wipe bathroom sink/toilet',10],['Clear couch/main surface',10]],evening:[['Load/run dishwasher',10],['Set out tomorrow essentials',5],['Move laundry forward',5],['Check Grace barn chores',2]],sunday:[['Check calendar',10],['Pick dinners',10],['Review bills',10],['Choose top 3 priorities',5]]};
+ state.dailyPlan=modes[mode].map((x,i)=>({id:'m'+i,text:x[0],room:'Quick Mode',min:x[1]}));save();renderDailyPlan()
+}
+
+function rooms(){return ['All','Kitchen','Living Room','Bedroom','Bathroom','Laundry','Organizing','Paperwork','Whole House']}
+function renderTabs(){document.getElementById('tabs').innerHTML=rooms().map(r=>`<button class="${r===room?'active':''}" onclick="room='${r}';renderTasks();renderTabs()">${r}</button>`).join('')}
+function renderTasks(){let list=state.tasks.filter(t=>room==='All'||t.room===room);document.getElementById('taskList').innerHTML=list.map(t=>`<div class="task ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id},this.checked)"><div class="txt">${t.text}<div class="tiny">${t.room} • ${t.min} min • ${t.priority===3?'High':t.priority===1?'Low':'Normal'}</div></div></div>`).join('')}
+function toggleTask(id,done){let t=state.tasks.find(x=>x.id===id);if(done&&!t.done){state.today.wins++;state.today.minutes+=t.min}t.done=done;render()}
+function addTask(){let txt=document.getElementById('newTask').value.trim();if(!txt)return;state.tasks.push({id:Date.now(),room:document.getElementById('newRoom').value,text:txt,min:10,priority:parseInt(document.getElementById('newPriority').value),done:false});document.getElementById('newTask').value='';render()}
+
+function renderRoutines(){
+ document.getElementById('routineList').innerHTML=state.routines.map(r=>`<div class="task ${r.done?'done':''}"><input type="checkbox" ${r.done?'checked':''} onchange="toggleRoutine(${r.id},this.checked)"><div class="txt"><b>${r.name}</b><div class="tiny">${r.frequency==='daily'?'Every day':r.day+'s'} • ${r.owner} • auto-resets</div></div><button onclick="deleteRoutine(${r.id})">Delete</button></div>`).join('')
+}
+function addRoutine(){
+ let n=document.getElementById('routineName').value.trim();if(!n)return;
+ let f=document.getElementById('routineFrequency').value;
+ state.routines.push({id:Date.now(),name:n,frequency:f,day:f==='weekly'?document.getElementById('routineDay').value:'',owner:document.getElementById('routineOwner').value,done:false,lastReset:todayISO});
+ document.getElementById('routineName').value='';render()
+}
+function toggleRoutine(id,done){let r=state.routines.find(x=>x.id===id);r.done=done;if(done){state.today.wins++}save();render()}
+function deleteRoutine(id){state.routines=state.routines.filter(x=>x.id!==id);render()}
+
+function renderAssignments(){document.getElementById('assignmentList').innerHTML=state.assignments.map(a=>`<div class="task ${a.done?'done':''}"><input type="checkbox" ${a.done?'checked':''} onchange="toggleAssignment(${a.id},this.checked)"><div class="txt"><b>${a.text}</b><div class="tiny">${a.owner}${a.due?' • due '+a.due:''}</div></div></div>`).join('')}
+function addAssignment(){let t=document.getElementById('assignTask').value.trim();if(!t)return;state.assignments.push({id:Date.now(),text:t,owner:document.getElementById('assignOwner').value,due:document.getElementById('assignDue').value,done:false});document.getElementById('assignTask').value='';render()}
+function toggleAssignment(id,done){let a=state.assignments.find(x=>x.id===id);a.done=done;if(done)state.today.wins++;save();render()}
+
+function addSimple(key,inputId,listId){let v=document.getElementById(inputId).value.trim();if(!v)return;state[key].push({id:Date.now(),text:v,done:false});document.getElementById(inputId).value='';render()}
+function renderSimple(key,listId){document.getElementById(listId).innerHTML=state[key].map(x=>`<div class="task ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleSimple('${key}',${x.id},this.checked)"><div class="txt">${x.text}</div></div>`).join('')}
+function toggleSimple(key,id,done){let x=state[key].find(a=>a.id===id);x.done=done;save();renderSimple(key,key==='groceries'?'groceryList':'supplyList')}
+
+const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function renderMeals(){document.getElementById('mealGrid').innerHTML=days.map(d=>`<div class="task"><div class="pill">${d.slice(0,3)}</div><input value="${(state.meals[d]||'').replace(/"/g,'&quot;')}" oninput="state.meals['${d}']=this.value;save()" placeholder="Dinner"></div>`).join('')}
+function fillEasyMeals(){let ideas=['Tacos / taco bowls','Sheet-pan chicken','Breakfast for dinner','Pasta + salad','Rotisserie chicken + sides','Soup + sandwiches','Leftovers / fend-for-yourself'];days.forEach((d,i)=>state.meals[d]=ideas[i]);render();save()}
+function clearMeals(){state.meals={};render();save()}
+function saveText(id){state[id]=document.getElementById(id).value;save()}
+function loadText(){['petNotes','billNotes','brainDump','priority1','priority2','priority3'].forEach(id=>{if(state[id])document.getElementById(id).value=state[id]})}
+
+const packs={
+ college:['Laptop / charger','Student ID / wallet','Medications','Class materials','Laundry / clothes','Toiletries','Dorm supplies','Important forms / documents','Anything to send back to UT Martin'],
+ horse:['Show clothes','Boots / hat / belt','Horse paperwork','Tack / pads','Grooming supplies','Feed / supplements','Buckets / hay bag','Cooler / chairs','Chargers'],
+ trip:['Wallet / ID','Medications','Phone / charger','Clothes','Toiletries','Pet needs','Snacks / drinks','Reservations']
+};
+function loadPack(type){let titles={college:'🎓 Brooke / UT Martin',horse:'🐴 Horse Show',trip:'🚗 Trip'};document.getElementById('packTitle').textContent=titles[type];document.getElementById('packList').innerHTML=packs[type].map(x=>`<label class="task"><input type="checkbox"><div class="txt">${x}</div></label>`).join('')}
+
+function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;document.getElementById('wins').textContent=w;document.getElementById('minutes').textContent=m;document.getElementById('progressFill').style.width=Math.min(100,w/5*100)+'%';document.getElementById('goalText').textContent=w>=5?'You reached today’s goal. Anything else is bonus.':`${w} of 5 little wins — five is enough.`}
+function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();save()}
+
+message();render();updateTimer();loadText();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Wins</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8fa79a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Little Wins">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+ --bg:#f7f3ee;--card:#fff;--ink:#2f3437;--muted:#747a7d;--line:#e7e0d9;
+ --sage:#8fa79a;--rose:#d7ab9a;--gold:#e7d4a3;--blue:#a9bec9;--lav:#b9b0c9;
+ --green:#7e9b82;--shadow:0 8px 24px rgba(60,50,45,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.app{max-width:930px;margin:auto;padding:14px 14px 100px}
+header{background:linear-gradient(135deg,#edf3ef,#f6e9df);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin-bottom:12px}
+h1{margin:0 0 4px;font-size:30px} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:0 0 8px}
+.sub{color:var(--muted);line-height:1.45}.tiny{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border:1px solid rgba(0,0,0,.02)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+button{border:0;border-radius:999px;padding:11px 15px;font-size:14px;font-weight:700;cursor:pointer;background:#ece8e3;color:var(--ink)}
+button.primary{background:var(--sage);color:#fff}button.rose{background:var(--rose);color:#fff}button.gold{background:var(--gold);color:#4d4637}
+button.blue{background:var(--blue);color:#fff}button.lav{background:var(--lav);color:#fff}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#fff;font-family:inherit}
+textarea{min-height:72px}
+.task{display:flex;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.task input[type=checkbox]{width:auto;margin-top:3px;transform:scale(1.2)}.task .txt{flex:1}.task.done .txt{text-decoration:line-through;color:#999}
+.pill{font-size:11px;padding:4px 7px;border-radius:999px;background:#f0ece7;color:#6b6762;white-space:nowrap}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#f6f3ef;border-radius:14px;padding:10px 12px;min-width:104px}.stat b{display:block;font-size:20px}
+.progressbar{width:100%;height:10px;background:#eee8e2;border-radius:999px;overflow:hidden;margin:10px 0 6px}.progressbar>div{height:100%;background:var(--green);width:0%}
+.timer{font-size:42px;font-weight:800;margin:6px 0}.focus{font-size:20px;font-weight:800;line-height:1.3;margin-top:10px}
+.encourage{margin-top:12px;padding:13px 15px;border-radius:14px;background:#fff;border-left:5px solid var(--sage);font-weight:650}
+.smallnote{background:#faf7f3;border-radius:12px;padding:10px 12px;font-size:13px;color:#666}
+.banner{display:none;background:#edf5ee;border:1px solid #d7e5d8;padding:13px;border-radius:14px;margin-top:10px;font-weight:700;text-align:center}
+.screen{display:none}
+#navToday:checked ~ .app #today,
+#navHome:checked ~ .app #home,
+#navMeals:checked ~ .app #meals,
+#navFamily:checked ~ .app #family,
+#navLists:checked ~ .app #lists{display:block}
+.navradio{position:fixed;opacity:0;pointer-events:none}
+#navToday:checked ~ .bottomnav label[for="navToday"],
+#navHome:checked ~ .bottomnav label[for="navHome"],
+#navMeals:checked ~ .bottomnav label[for="navMeals"],
+#navFamily:checked ~ .bottomnav label[for="navFamily"],
+#navLists:checked ~ .bottomnav label[for="navLists"]{color:var(--ink);background:#f4f1ed}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10}
+.navinner{width:100%;max-width:930px;display:grid;grid-template-columns:repeat(5,1fr)}
+.navbtn{border-radius:0;background:transparent;padding:10px 4px 9px;font-size:11px;color:var(--muted);text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.navbtn span{display:block;font-size:19px;margin-bottom:2px}
+.planbox{background:linear-gradient(135deg,#eef4ef,#fff7ee);border:1px solid var(--line);border-radius:18px;padding:14px}
+.planitem{display:flex;gap:8px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.planitem:last-child{border-bottom:0}
+.addrow{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:7px}@media(max-width:700px){.addrow{grid-template-columns:1fr}}
+.listrow{display:grid;grid-template-columns:1fr auto;gap:7px}
+.sectiontabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}.sectiontabs button.active{background:var(--sage);color:#fff}
+.person{padding:13px;border-radius:16px;background:#faf7f3;border:1px solid var(--line)}
+.todayroutine{border-left:5px solid var(--sage)}
+</style>
+</head>
+<body>
+<input class="navradio" type="radio" name="nav" id="navToday" checked>
+<input class="navradio" type="radio" name="nav" id="navHome">
+<input class="navradio" type="radio" name="nav" id="navMeals">
+<input class="navradio" type="radio" name="nav" id="navFamily">
+<input class="navradio" type="radio" name="nav" id="navLists">
+<div class="app">
+<header>
+ <div class="tiny">Little Wins V5</div>
+ <h1>Home & Family, Simplified 💛</h1>
+ <div class="sub">A home-management app that remembers the routine so you don't have to.</div>
+ <div class="encourage" id="message"></div>
+</header>
+
+<section id="today" class="screen">
+ <div class="card">
+  <h2>✨ Plan My Day</h2>
+  <div class="grid">
+   <div><label class="tiny">Realistic time available</label>
+    <select id="planTime"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select>
+   </div>
+   <div><label class="tiny">Energy today</label>
+    <select id="planEnergy"><option value="low">Low — keep things afloat</option><option value="medium" selected>Medium — make progress</option><option value="high">High — productive reset</option></select>
+   </div>
+  </div>
+  <div class="row" style="margin-top:10px"><button class="primary" onclick="planMyDay()">Build my 3–5 wins</button><button onclick="clearPlan()">Clear</button></div>
+  <div class="planbox" id="dailyPlan" style="margin-top:12px"></div>
+ </div>
+
+ <div class="card">
+  <h2>📆 Due Today</h2>
+  <div class="stack" id="dueToday"></div>
+ </div>
+
+ <div class="card">
+  <h2>⚡ Focus Burst</h2>
+  <div class="row"><button onclick="setBurst(5)">5 min</button><button class="gold" onclick="setBurst(10)">10 min</button><button class="rose" onclick="setBurst(15)">15 min</button><button class="primary" onclick="pickTask()">🎯 Pick for me</button></div>
+  <div class="focus" id="focusTask">Choose a task or let me pick one.</div><div class="tiny" id="focusMeta"></div><div class="timer" id="timer">05:00</div>
+  <div class="row"><button class="primary" id="startBtn" onclick="toggleTimer()">Start</button><button onclick="resetTimer()">Reset</button><button onclick="completeFocus()">✓ Done</button></div>
+  <div class="banner" id="celebrate"></div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><h2>🌱 Today Counts</h2><div class="stats"><div class="stat"><b id="wins">0</b><span class="tiny">wins</span></div><div class="stat"><b id="minutes">0</b><span class="tiny">minutes</span></div></div><div class="progressbar"><div id="progressFill"></div></div><div class="tiny" id="goalText"></div></div>
+  <div class="card"><h2>🧭 Quick Modes</h2><div class="row"><button onclick="modePlan('low')">😮‍💨 Low energy</button><button onclick="modePlan('guest')">🚪 Guests</button><button onclick="modePlan('evening')">🌙 Evening</button><button onclick="modePlan('sunday')">📅 Sunday</button></div></div>
+ </div>
+</section>
+
+<section id="home" class="screen">
+ <div class="card">
+  <h2>🏠 Home Tasks</h2><div class="sectiontabs" id="tabs"></div><div class="stack" id="taskList"></div>
+  <div class="addrow" style="margin-top:10px"><input id="newTask" placeholder="Task"><select id="newRoom"><option>Kitchen</option><option>Living Room</option><option>Bedroom</option><option>Bathroom</option><option>Laundry</option><option>Organizing</option><option>Paperwork</option><option>Whole House</option></select><select id="newPriority"><option value="2">Normal</option><option value="3">High</option><option value="1">Low</option></select><button class="primary" onclick="addTask()">Add</button></div>
+ </div>
+
+ <div class="card">
+  <h2>🔁 Automatic Routines</h2>
+  <div class="smallnote" style="margin-bottom:10px">Daily routines automatically reset each new day. Weekly routines reset on their scheduled weekday. Once you set them up, you can simply check them off.</div>
+  <div class="stack" id="routineList"></div>
+  <div class="addrow" style="margin-top:10px">
+   <input id="routineName" placeholder="Routine">
+   <select id="routineFrequency"><option value="daily">Every day</option><option value="weekly">Weekly</option></select>
+   <select id="routineDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+   <button class="primary" onclick="addRoutine()">Add</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+   <select id="routineOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select>
+  </div>
+ </div>
+</section>
+
+<section id="meals" class="screen">
+ <div class="card"><h2>🍽️ Meal Plan</h2><div class="stack" id="mealGrid"></div><div class="row" style="margin-top:10px"><button onclick="fillEasyMeals()">Fill easy dinners</button><button onclick="clearMeals()">Clear</button></div></div>
+ <div class="grid">
+  <div class="card"><h2>🛒 Groceries</h2><div class="listrow"><input id="groceryInput" placeholder="Add item"><button class="primary" onclick="addSimple('groceries','groceryInput','groceryList')">Add</button></div><div class="stack" id="groceryList" style="margin-top:10px"></div></div>
+  <div class="card"><h2>🧻 Supplies</h2><div class="listrow"><input id="supplyInput" placeholder="Add item"><button class="primary" onclick="addSimple('supplies','supplyInput','supplyList')">Add</button></div><div class="stack" id="supplyList" style="margin-top:10px"></div></div>
+ </div>
+</section>
+
+<section id="family" class="screen">
+ <div class="grid">
+  <div class="person"><h3>🎓 Brooke</h3><div class="sub">18 • College at UT Martin</div><div class="tiny" style="margin-top:8px">Best for occasional family tasks, travel/college reminders, or things she can handle while away.</div></div>
+  <div class="person"><h3>🏡 Grace</h3><div class="sub">16 • Lives at home</div><div class="tiny" style="margin-top:8px">Nighttime barn chores are already set as a daily recurring responsibility.</div></div>
+ </div>
+
+ <div class="card" style="margin-top:12px">
+  <h2>👨‍👩‍👧 Family Assignments</h2>
+  <div class="stack" id="assignmentList"></div>
+  <div class="addrow" style="margin-top:10px"><input id="assignTask" placeholder="Task"><select id="assignOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select><input id="assignDue" type="date"><button class="primary" onclick="addAssignment()">Assign</button></div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><h2>🐾 Pet Care</h2><textarea id="petNotes" placeholder="Food, vet, meds, supplies…" oninput="saveText('petNotes')"></textarea></div>
+  <div class="card"><h2>💳 Bills / Reminders</h2><textarea id="billNotes" placeholder="Due dates, payments, follow-ups…" oninput="saveText('billNotes')"></textarea></div>
+ </div>
+</section>
+
+<section id="lists" class="screen">
+ <div class="card"><h2>🧠 Brain Dump</h2><textarea id="brainDump" placeholder="Everything you do not want to keep carrying in your head…" oninput="saveText('brainDump')"></textarea></div>
+ <div class="card"><h2>🎒 Packing Lists</h2><div class="row"><button onclick="loadPack('college')">Brooke / College</button><button onclick="loadPack('horse')">Horse Show</button><button onclick="loadPack('trip')">Trip</button></div><div class="focus" id="packTitle" style="font-size:18px">Choose a checklist.</div><div class="stack" id="packList"></div></div>
+ <div class="card"><h2>📅 Sunday Top 3</h2><input id="priority1" placeholder="1. Most important" oninput="saveText('priority1')"><input id="priority2" placeholder="2. Important" oninput="saveText('priority2')" style="margin-top:7px"><input id="priority3" placeholder="3. Helpful if possible" oninput="saveText('priority3')" style="margin-top:7px"></div>
+</section>
+</div>
+
+<div class="bottomnav"><div class="navinner">
+<label class="navbtn" for="navToday"><span>✨</span>Today</label>
+<label class="navbtn" for="navHome"><span>🏠</span>Home</label>
+<label class="navbtn" for="navMeals"><span>🍽️</span>Meals</label>
+<label class="navbtn" for="navFamily"><span>👨‍👩‍👧</span>Family</label>
+<label class="navbtn" for="navLists"><span>📝</span>Lists</label>
+</div></div>
+
+<script>
+const encouragement=["Do the task that gives you the most relief per minute.","Future-you deserves help, not a lecture.","If you are tired, choose maintenance over improvement.","One finished task is better than ten half-started ones.","Your home is allowed to look lived in.","Choose the next right thing, not every right thing.","Little wins still count on hard days."];
+
+const seedTasks=[
+['Kitchen','Clear and wipe one counter',5,2],['Kitchen','Load or unload dishwasher',10,3],['Kitchen','Throw away expired food from one fridge shelf',10,2],
+['Living Room','Put away 10 things',5,2],['Living Room','Clear one flat surface',5,2],['Living Room','Vacuum main walking path',10,2],
+['Bedroom','Make the bed',5,1],['Bedroom','Clear one nightstand',5,1],['Bedroom','Put away 10 clothing items',5,2],
+['Bathroom','Wipe sink and counter',5,2],['Bathroom','Clean toilet',5,3],['Bathroom','Gather trash',5,2],
+['Laundry','Start one load',5,3],['Laundry','Fold one basket only',10,2],['Laundry','Put away 10 items',5,2],
+['Organizing','Declutter one drawer',10,1],['Paperwork','Open and sort today’s mail',5,2],['Whole House','Collect visible trash',10,3],['Whole House','Do a 10-item reset',5,2]
+];
+
+let state=JSON.parse(localStorage.getItem('littleWinsV5')||'{}');
+if(!state.tasks)state.tasks=seedTasks.map((x,i)=>({id:i+1,room:x[0],text:x[1],min:x[2],priority:x[3],done:false}));
+if(!state.routines)state.routines=[
+{id:101,name:'Nighttime barn chores',frequency:'daily',day:'',owner:'Grace',done:false,lastReset:''},
+{id:102,name:'Bathrooms',frequency:'weekly',day:'Tuesday',owner:'Family',done:false,lastReset:''},
+{id:103,name:'Papers / mail',frequency:'weekly',day:'Wednesday',owner:'Me',done:false,lastReset:''},
+{id:104,name:'Floors',frequency:'weekly',day:'Thursday',owner:'Family',done:false,lastReset:''},
+{id:105,name:'Fridge / grocery check',frequency:'weekly',day:'Friday',owner:'Me',done:false,lastReset:''},
+{id:106,name:'One declutter zone',frequency:'weekly',day:'Saturday',owner:'Family',done:false,lastReset:''}
+];
+if(!state.assignments)state.assignments=[]; if(!state.groceries)state.groceries=[]; if(!state.supplies)state.supplies=[]; if(!state.meals)state.meals={};
+
+const now=new Date(), todayISO=now.toISOString().slice(0,10), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+if(!state.today||state.today.date!==todayISO)state.today={date:todayISO,wins:0,minutes:0};
+
+function autoResetRoutines(){
+ state.routines.forEach(r=>{
+   if(r.frequency==='daily'){
+     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+   } else if(r.frequency==='weekly' && r.day===todayName){
+     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+   }
+ });
+ save();
+}
+autoResetRoutines();
+
+let room='All',seconds=300,chosenMinutes=5,ticking=null,currentTask=null;
+
+function save(){localStorage.setItem('littleWinsV5',JSON.stringify(state))}
+function showScreen(id){
+  var map={today:'navToday',home:'navHome',meals:'navMeals',family:'navFamily',lists:'navLists'};
+  var radio=document.getElementById(map[id]);
+  if(radio){ radio.checked=true; }
+  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+}
+function message(){document.getElementById('message').textContent=encouragement[Math.floor(Math.random()*encouragement.length)]}
+function celebrate(t){let b=document.getElementById('celebrate');b.textContent=t;b.style.display='block'}
+function setBurst(min){chosenMinutes=min;seconds=min*60;updateTimer()}
+function updateTimer(){let m=Math.floor(seconds/60).toString().padStart(2,'0'),s=(seconds%60).toString().padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+function toggleTimer(){let b=document.getElementById('startBtn');if(ticking){clearInterval(ticking);ticking=null;b.textContent='Start';return}b.textContent='Pause';ticking=setInterval(()=>{seconds--;updateTimer();if(seconds<=0){clearInterval(ticking);ticking=null;b.textContent='Start';celebrate('Timer finished. You may stop now — that counts.')}},1000)}
+function resetTimer(){if(ticking){clearInterval(ticking);ticking=null}seconds=chosenMinutes*60;updateTimer();document.getElementById('startBtn').textContent='Start'}
+function quickFocus(text,min){currentTask=null;chosenMinutes=min;seconds=min*60;updateTimer();document.getElementById('focusTask').textContent=text;document.getElementById('focusMeta').textContent=`About ${min} minutes`;showScreen('today')}
+function completeFocus(){if(currentTask&&currentTask.type==='task'){let t=state.tasks.find(x=>x.id===currentTask.id);if(t)t.done=true}state.today.wins++;state.today.minutes+=chosenMinutes;celebrate(encouragement[Math.floor(Math.random()*encouragement.length)]);render()}
+function pickTask(){let pool=state.tasks.filter(t=>!t.done&&t.min<=chosenMinutes).map(t=>({...t,type:'task'}));if(!pool.length)pool=state.tasks.filter(t=>!t.done).map(t=>({...t,type:'task'}));pool.sort((a,b)=>b.priority-a.priority||a.min-b.min);if(!pool.length)return celebrate('Your backlog is clear.');currentTask=pool[0];document.getElementById('focusTask').textContent=currentTask.text;document.getElementById('focusMeta').textContent=`${currentTask.room} • ${currentTask.min} min`;setBurst(currentTask.min)}
+
+function dueCandidates(){
+ let arr=[];
+ state.routines.forEach(r=>{
+   if(!r.done && (r.frequency==='daily'||r.day===todayName)) arr.push({id:'r'+r.id,text:r.name,room:`${r.owner} • recurring`,min:r.name.toLowerCase().includes('barn')?15:10,priority:3,type:'routine',sourceId:r.id});
+ });
+ state.assignments.forEach(a=>{
+   if(!a.done && a.due && a.due<=todayISO) arr.push({id:'a'+a.id,text:a.text,room:`${a.owner} • due`,min:10,priority:3,type:'assignment',sourceId:a.id});
+ });
+ return arr;
+}
+function renderDueToday(){
+ let items=dueCandidates(),el=document.getElementById('dueToday');
+ if(!items.length){el.innerHTML='<div class="tiny">Nothing recurring or assigned is due today.</div>';return}
+ el.innerHTML=items.map(x=>`<div class="task todayroutine"><div class="txt"><b>${x.text}</b><div class="tiny">${x.room}</div></div><button onclick="quickFocus('${x.text.replace(/'/g,"\\'")}',${x.min})">Start</button></div>`).join('');
+}
+function planMyDay(){
+ let max=parseInt(document.getElementById('planTime').value),energy=document.getElementById('planEnergy').value;
+ let candidates=dueCandidates();
+ state.tasks.filter(t=>!t.done).forEach(t=>candidates.push({...t,room:t.room,type:'task',score:t.priority*4+(t.min<=10?2:0)}));
+ candidates.forEach(t=>{if(t.score==null)t.score=14});
+ if(energy==='low')candidates=candidates.filter(t=>t.min<=10||t.type==='routine');
+ if(energy==='high')candidates.forEach(t=>t.score+=1);
+ candidates.sort((a,b)=>b.score-a.score||a.min-b.min);
+ let total=0,chosen=[];
+ for(let t of candidates){if(chosen.length>=5)break;if(total+t.min<=max){chosen.push(t);total+=t.min}}
+ if(chosen.length<3){for(let t of candidates){if(chosen.some(x=>x.id===t.id))continue;if(chosen.length>=3)break;chosen.push(t)}}
+ state.dailyPlan=chosen;save();renderDailyPlan();
+}
+function renderDailyPlan(){
+ let box=document.getElementById('dailyPlan'),p=state.dailyPlan||[];
+ if(!p.length){box.innerHTML='<div class="tiny">Choose your time and energy, then let Little Wins narrow the day for you.</div>';return}
+ box.innerHTML=p.map((t,i)=>`<div class="planitem"><div class="pill">${i+1}</div><div style="flex:1"><b>${t.text}</b><div class="tiny">${t.room||'Task'} • ~${t.min||10} min</div></div><button onclick="quickFocus('${t.text.replace(/'/g,"\\'")}',${t.min||10})">Start</button></div>`).join('');
+}
+function clearPlan(){state.dailyPlan=[];save();renderDailyPlan()}
+function modePlan(mode){
+ const modes={low:[['Collect visible trash',5],['Contain dishes',5],['Move laundry one step',5]],guest:[['Collect visible trash',5],['Clear entry and walking path',5],['Wipe bathroom sink/toilet',10],['Clear couch/main surface',10]],evening:[['Load/run dishwasher',10],['Set out tomorrow essentials',5],['Move laundry forward',5],['Check Grace barn chores',2]],sunday:[['Check calendar',10],['Pick dinners',10],['Review bills',10],['Choose top 3 priorities',5]]};
+ state.dailyPlan=modes[mode].map((x,i)=>({id:'m'+i,text:x[0],room:'Quick Mode',min:x[1]}));save();renderDailyPlan()
+}
+
+function rooms(){return ['All','Kitchen','Living Room','Bedroom','Bathroom','Laundry','Organizing','Paperwork','Whole House']}
+function renderTabs(){document.getElementById('tabs').innerHTML=rooms().map(r=>`<button class="${r===room?'active':''}" onclick="room='${r}';renderTasks();renderTabs()">${r}</button>`).join('')}
+function renderTasks(){let list=state.tasks.filter(t=>room==='All'||t.room===room);document.getElementById('taskList').innerHTML=list.map(t=>`<div class="task ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id},this.checked)"><div class="txt">${t.text}<div class="tiny">${t.room} • ${t.min} min • ${t.priority===3?'High':t.priority===1?'Low':'Normal'}</div></div></div>`).join('')}
+function toggleTask(id,done){let t=state.tasks.find(x=>x.id===id);if(done&&!t.done){state.today.wins++;state.today.minutes+=t.min}t.done=done;render()}
+function addTask(){let txt=document.getElementById('newTask').value.trim();if(!txt)return;state.tasks.push({id:Date.now(),room:document.getElementById('newRoom').value,text:txt,min:10,priority:parseInt(document.getElementById('newPriority').value),done:false});document.getElementById('newTask').value='';render()}
+
+function renderRoutines(){
+ document.getElementById('routineList').innerHTML=state.routines.map(r=>`<div class="task ${r.done?'done':''}"><input type="checkbox" ${r.done?'checked':''} onchange="toggleRoutine(${r.id},this.checked)"><div class="txt"><b>${r.name}</b><div class="tiny">${r.frequency==='daily'?'Every day':r.day+'s'} • ${r.owner} • auto-resets</div></div><button onclick="deleteRoutine(${r.id})">Delete</button></div>`).join('')
+}
+function addRoutine(){
+ let n=document.getElementById('routineName').value.trim();if(!n)return;
+ let f=document.getElementById('routineFrequency').value;
+ state.routines.push({id:Date.now(),name:n,frequency:f,day:f==='weekly'?document.getElementById('routineDay').value:'',owner:document.getElementById('routineOwner').value,done:false,lastReset:todayISO});
+ document.getElementById('routineName').value='';render()
+}
+function toggleRoutine(id,done){let r=state.routines.find(x=>x.id===id);r.done=done;if(done){state.today.wins++}save();render()}
+function deleteRoutine(id){state.routines=state.routines.filter(x=>x.id!==id);render()}
+
+function renderAssignments(){document.getElementById('assignmentList').innerHTML=state.assignments.map(a=>`<div class="task ${a.done?'done':''}"><input type="checkbox" ${a.done?'checked':''} onchange="toggleAssignment(${a.id},this.checked)"><div class="txt"><b>${a.text}</b><div class="tiny">${a.owner}${a.due?' • due '+a.due:''}</div></div></div>`).join('')}
+function addAssignment(){let t=document.getElementById('assignTask').value.trim();if(!t)return;state.assignments.push({id:Date.now(),text:t,owner:document.getElementById('assignOwner').value,due:document.getElementById('assignDue').value,done:false});document.getElementById('assignTask').value='';render()}
+function toggleAssignment(id,done){let a=state.assignments.find(x=>x.id===id);a.done=done;if(done)state.today.wins++;save();render()}
+
+function addSimple(key,inputId,listId){let v=document.getElementById(inputId).value.trim();if(!v)return;state[key].push({id:Date.now(),text:v,done:false});document.getElementById(inputId).value='';render()}
+function renderSimple(key,listId){document.getElementById(listId).innerHTML=state[key].map(x=>`<div class="task ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleSimple('${key}',${x.id},this.checked)"><div class="txt">${x.text}</div></div>`).join('')}
+function toggleSimple(key,id,done){let x=state[key].find(a=>a.id===id);x.done=done;save();renderSimple(key,key==='groceries'?'groceryList':'supplyList')}
+
+const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function renderMeals(){document.getElementById('mealGrid').innerHTML=days.map(d=>`<div class="task"><div class="pill">${d.slice(0,3)}</div><input value="${(state.meals[d]||'').replace(/"/g,'&quot;')}" oninput="state.meals['${d}']=this.value;save()" placeholder="Dinner"></div>`).join('')}
+function fillEasyMeals(){let ideas=['Tacos / taco bowls','Sheet-pan chicken','Breakfast for dinner','Pasta + salad','Rotisserie chicken + sides','Soup + sandwiches','Leftovers / fend-for-yourself'];days.forEach((d,i)=>state.meals[d]=ideas[i]);render();save()}
+function clearMeals(){state.meals={};render();save()}
+function saveText(id){state[id]=document.getElementById(id).value;save()}
+function loadText(){['petNotes','billNotes','brainDump','priority1','priority2','priority3'].forEach(id=>{if(state[id])document.getElementById(id).value=state[id]})}
+
+const packs={
+ college:['Laptop / charger','Student ID / wallet','Medications','Class materials','Laundry / clothes','Toiletries','Dorm supplies','Important forms / documents','Anything to send back to UT Martin'],
+ horse:['Show clothes','Boots / hat / belt','Horse paperwork','Tack / pads','Grooming supplies','Feed / supplements','Buckets / hay bag','Cooler / chairs','Chargers'],
+ trip:['Wallet / ID','Medications','Phone / charger','Clothes','Toiletries','Pet needs','Snacks / drinks','Reservations']
+};
+function loadPack(type){let titles={college:'🎓 Brooke / UT Martin',horse:'🐴 Horse Show',trip:'🚗 Trip'};document.getElementById('packTitle').textContent=titles[type];document.getElementById('packList').innerHTML=packs[type].map(x=>`<label class="task"><input type="checkbox"><div class="txt">${x}</div></label>`).join('')}
+
+function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;document.getElementById('wins').textContent=w;document.getElementById('minutes').textContent=m;document.getElementById('progressFill').style.width=Math.min(100,w/5*100)+'%';document.getElementById('goalText').textContent=w>=5?'You reached today’s goal. Anything else is bonus.':`${w} of 5 little wins — five is enough.`}
+function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();save()}
+
+message();render();updateTimer();loadText();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("./service-worker.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
