@@ -89,7 +89,7 @@ textarea{min-height:72px}
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V6</div>
+ <div class="tiny">Little Wins V6.1</div>
  <h1>Home & Family, Simplified 💛</h1>
  <div class="sub">A home-management app that remembers the routine so you don't have to.</div>
  <div class="encourage" id="message"></div>
@@ -249,7 +249,14 @@ if(state.billNotes && !state.billNotesMigrated){
   state.billNotesMigrated=true;
 }
 
-const now=new Date(), todayISO=now.toISOString().slice(0,10), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+const now=new Date();
+function localISODate(d){
+ const y=d.getFullYear();
+ const m=String(d.getMonth()+1).padStart(2,'0');
+ const day=String(d.getDate()).padStart(2,'0');
+ return `${y}-${m}-${day}`;
+}
+const todayISO=localISODate(now), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
 if(!state.today||state.today.date!==todayISO)state.today={date:todayISO,wins:0,minutes:0};
 
 function autoResetRoutines(){
