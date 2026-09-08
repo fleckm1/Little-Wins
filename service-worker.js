@@ -1,4 +1,5 @@
-const CACHE='little-wins-v2';
+const CACHE='little-wins-v3';
+
 const ASSETS=[
 './',
 './index.html',
@@ -35,17 +36,22 @@ e.respondWith(
 fetch(e.request)
 .then(response => {
 const copy = response.clone();
+
 caches.open(CACHE).then(cache => {
 cache.put('./index.html', copy);
 });
+
 return response;
 })
 .catch(() => caches.match('./index.html'))
 );
+
 return;
 }
 
 e.respondWith(
-caches.match(e.request).then(response => response || fetch(e.request))
+caches.match(e.request).then(response =>
+response || fetch(e.request)
+)
 );
 });
