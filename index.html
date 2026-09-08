@@ -62,6 +62,23 @@ textarea{min-height:72px}
 .sectiontabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}.sectiontabs button.active{background:var(--sage);color:#fff}
 .person{padding:13px;border-radius:16px;background:#faf7f3;border:1px solid var(--line)}
 .todayroutine{border-left:5px solid var(--sage)}
+
+.moneygrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.moneytotal{font-size:28px;font-weight:800;margin-top:4px}
+.billform{display:grid;grid-template-columns:1.35fr .8fr .9fr .9fr .9fr auto;gap:8px;align-items:end}
+.billitem{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.amount{font-weight:800;white-space:nowrap}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#f1eee9;font-size:11px;font-weight:700;margin-right:5px}
+.badge.due{background:#fff1d7}.badge.overdue{background:#fde1e1}.badge.paid{background:#e6f2ea}
+.billactions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:700px){
+ .moneygrid{grid-template-columns:1fr 1fr}
+ .billform{grid-template-columns:1fr 1fr}
+ .billform .wide{grid-column:1/-1}
+ .billitem{grid-template-columns:auto 1fr}
+ .billactions{grid-column:1/-1;justify-content:flex-start}
+}
+
 </style>
 </head>
 <body>
@@ -72,7 +89,7 @@ textarea{min-height:72px}
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V5</div>
+ <div class="tiny">Little Wins V6</div>
  <h1>Home & Family, Simplified 💛</h1>
  <div class="sub">A home-management app that remembers the routine so you don't have to.</div>
  <div class="encourage" id="message"></div>
@@ -96,6 +113,19 @@ textarea{min-height:72px}
  <div class="card">
   <h2>📆 Due Today</h2>
   <div class="stack" id="dueToday"></div>
+ </div>
+
+ <div class="card">
+  <h2>💵 Money Coming Up</h2>
+  <div class="smallnote">Bills due in the next 7 days. Monthly bills automatically roll forward after you mark them paid.</div>
+  <div class="moneygrid">
+   <div class="stat"><b id="money7Total">$0.00</b><span class="tiny">next 7 days</span></div>
+   <div class="stat"><b id="money7Count">0</b><span class="tiny">bills coming up</span></div>
+   <div class="stat"><b id="moneyOverdue">$0.00</b><span class="tiny">overdue</span></div>
+   <div class="stat"><b id="moneyMonth">$0.00</b><span class="tiny">next 30 days</span></div>
+  </div>
+  <div class="stack" id="moneyUpcoming" style="margin-top:10px"></div>
+  <div class="row" style="margin-top:10px"><button onclick="showScreen('family');setTimeout(function(){document.getElementById('billName').focus()},100)">Manage bills & reminders</button></div>
  </div>
 
  <div class="card">
@@ -154,10 +184,25 @@ textarea{min-height:72px}
   <div class="addrow" style="margin-top:10px"><input id="assignTask" placeholder="Task"><select id="assignOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select><input id="assignDue" type="date"><button class="primary" onclick="addAssignment()">Assign</button></div>
  </div>
 
- <div class="grid">
-  <div class="card"><h2>🐾 Pet Care</h2><textarea id="petNotes" placeholder="Food, vet, meds, supplies…" oninput="saveText('petNotes')"></textarea></div>
-  <div class="card"><h2>💳 Bills / Reminders</h2><textarea id="billNotes" placeholder="Due dates, payments, follow-ups…" oninput="saveText('billNotes')"></textarea></div>
+ <div class="card">
+  <h2>💳 Bills & Reminders</h2>
+  <div class="smallnote">Add a bill or reminder once. Little Wins will keep the due date visible and can automatically roll monthly bills to the next month when paid.</div>
+  <div class="billform" style="margin-top:12px">
+   <div class="wide"><label class="tiny">Name</label><input id="billName" placeholder="Electric bill, horse board, dentist…"></div>
+   <div><label class="tiny">Type</label><select id="billType"><option value="bill">Bill</option><option value="reminder">Reminder</option></select></div>
+   <div><label class="tiny">Amount (optional)</label><input id="billAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+   <div><label class="tiny">Due date</label><input id="billDue" type="date"></div>
+   <div><label class="tiny">Repeats</label><select id="billRepeat"><option value="none">One time</option><option value="monthly">Monthly</option></select></div>
+   <div><button class="primary" onclick="addBill()">Add</button></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+   <button id="billFilterActive" class="primary" onclick="billFilter='active';renderBills()">Active</button>
+   <button id="billFilterAll" onclick="billFilter='all';renderBills()">All</button>
+  </div>
+  <div class="stack" id="billList" style="margin-top:10px"></div>
  </div>
+
+ <div class="card"><h2>🐾 Pet Care</h2><textarea id="petNotes" placeholder="Food, vet, meds, supplies…" oninput="saveText('petNotes')"></textarea></div>
 </section>
 
 <section id="lists" class="screen">
@@ -198,6 +243,11 @@ if(!state.routines)state.routines=[
 {id:106,name:'One declutter zone',frequency:'weekly',day:'Saturday',owner:'Family',done:false,lastReset:''}
 ];
 if(!state.assignments)state.assignments=[]; if(!state.groceries)state.groceries=[]; if(!state.supplies)state.supplies=[]; if(!state.meals)state.meals={};
+if(!state.bills)state.bills=[];
+if(state.billNotes && !state.billNotesMigrated){
+  state.bills.push({id:Date.now(),name:'Previous Bills / Reminders notes',type:'reminder',amount:null,due:'',repeat:'none',done:false,legacyNote:state.billNotes,lastCompleted:''});
+  state.billNotesMigrated=true;
+}
 
 const now=new Date(), todayISO=now.toISOString().slice(0,10), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
 if(!state.today||state.today.date!==todayISO)state.today={date:todayISO,wins:0,minutes:0};
@@ -240,6 +290,9 @@ function dueCandidates(){
  });
  state.assignments.forEach(a=>{
    if(!a.done && a.due && a.due<=todayISO) arr.push({id:'a'+a.id,text:a.text,room:`${a.owner} • due`,min:10,priority:3,type:'assignment',sourceId:a.id});
+ });
+ state.bills.forEach(b=>{
+   if(!b.done && b.due && b.due<=todayISO) arr.push({id:'b'+b.id,text:(b.type==='bill'?'Pay ':'Handle ')+b.name,room:`${b.type==='bill'?'Bill':'Reminder'} • ${billStatusText(b)}`,min:5,priority:3,type:'bill',sourceId:b.id});
  });
  return arr;
 }
@@ -294,6 +347,141 @@ function renderAssignments(){document.getElementById('assignmentList').innerHTML
 function addAssignment(){let t=document.getElementById('assignTask').value.trim();if(!t)return;state.assignments.push({id:Date.now(),text:t,owner:document.getElementById('assignOwner').value,due:document.getElementById('assignDue').value,done:false});document.getElementById('assignTask').value='';render()}
 function toggleAssignment(id,done){let a=state.assignments.find(x=>x.id===id);a.done=done;if(done)state.today.wins++;save();render()}
 
+
+let billFilter='active';
+
+function parseLocalDate(s){
+ if(!s)return null;
+ const p=s.split('-').map(Number);
+ return new Date(p[0],p[1]-1,p[2],12,0,0,0);
+}
+function isoLocal(d){
+ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+ return `${y}-${m}-${day}`;
+}
+function addMonthsClamped(dateStr,n){
+ const d=parseLocalDate(dateStr); if(!d)return '';
+ const originalDay=d.getDate();
+ const targetMonth=d.getMonth()+n;
+ const y=d.getFullYear()+Math.floor(targetMonth/12);
+ const m=((targetMonth%12)+12)%12;
+ const last=new Date(y,m+1,0).getDate();
+ return isoLocal(new Date(y,m,Math.min(originalDay,last),12));
+}
+function dayDiff(dateStr){
+ const d=parseLocalDate(dateStr); if(!d)return 99999;
+ const t=parseLocalDate(todayISO);
+ return Math.round((d-t)/86400000);
+}
+function money(v){return '$'+Number(v||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtDate(s){
+ const d=parseLocalDate(s); if(!d)return 'No due date';
+ return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
+}
+function billStatusText(b){
+ if(b.done)return 'Completed';
+ if(!b.due)return 'No due date';
+ const diff=dayDiff(b.due);
+ if(diff<0)return `${Math.abs(diff)} day${Math.abs(diff)===1?'':'s'} overdue`;
+ if(diff===0)return 'Due today';
+ if(diff===1)return 'Due tomorrow';
+ return `Due in ${diff} days`;
+}
+function billStatusClass(b){
+ if(b.done)return 'paid';
+ const diff=dayDiff(b.due);
+ if(b.due && diff<0)return 'overdue';
+ if(b.due && diff<=7)return 'due';
+ return '';
+}
+function addBill(){
+ const name=document.getElementById('billName').value.trim();
+ if(!name)return;
+ const raw=document.getElementById('billAmount').value;
+ state.bills.push({
+  id:Date.now(),
+  name:name,
+  type:document.getElementById('billType').value,
+  amount:raw===''?null:Math.max(0,parseFloat(raw)||0),
+  due:document.getElementById('billDue').value,
+  repeat:document.getElementById('billRepeat').value,
+  done:false,
+  lastCompleted:''
+ });
+ document.getElementById('billName').value='';
+ document.getElementById('billAmount').value='';
+ document.getElementById('billDue').value='';
+ document.getElementById('billRepeat').value='none';
+ render();
+}
+function completeBill(id){
+ const b=state.bills.find(x=>x.id===id); if(!b)return;
+ const completed=todayISO;
+ if(b.repeat==='monthly' && b.due){
+   b.lastCompleted=completed;
+   b.due=addMonthsClamped(b.due,1);
+   b.done=false;
+   celebrate(`${b.name} paid. Next due ${fmtDate(b.due)}.`);
+ } else {
+   b.done=true;
+   b.lastCompleted=completed;
+   state.today.wins++;
+   celebrate(`${b.name} handled. One less thing to carry.`);
+ }
+ save();render();
+}
+function reopenBill(id){const b=state.bills.find(x=>x.id===id);if(b){b.done=false;save();render()}}
+function deleteBill(id){state.bills=state.bills.filter(x=>x.id!==id);save();render()}
+function renderBills(){
+ const list=document.getElementById('billList'); if(!list)return;
+ let items=state.bills.slice().sort((a,b)=>{
+   if(a.done!==b.done)return a.done?1:-1;
+   if(!a.due&&!b.due)return 0;if(!a.due)return 1;if(!b.due)return -1;
+   return a.due.localeCompare(b.due);
+ });
+ if(billFilter==='active')items=items.filter(b=>!b.done);
+ document.getElementById('billFilterActive').classList.toggle('primary',billFilter==='active');
+ document.getElementById('billFilterAll').classList.toggle('primary',billFilter==='all');
+ if(!items.length){list.innerHTML='<div class="tiny">No bills or reminders here yet.</div>';return}
+ list.innerHTML=items.map(b=>{
+   const amount=b.amount!=null?`<div class="amount">${money(b.amount)}</div>`:'';
+   const repeat=b.repeat==='monthly'?'<span class="badge">Monthly</span>':'';
+   const type=`<span class="badge">${b.type==='bill'?'Bill':'Reminder'}</span>`;
+   const status=`<span class="badge ${billStatusClass(b)}">${billStatusText(b)}</span>`;
+   const last=b.lastCompleted?`<div class="tiny">Last completed ${fmtDate(b.lastCompleted)}</div>`:'';
+   const legacy=b.legacyNote?`<div class="tiny" style="white-space:pre-wrap;margin-top:4px">${b.legacyNote}</div>`:'';
+   const action=b.done
+     ?`<button onclick="reopenBill(${b.id})">Reopen</button>`
+     :`<button class="primary" onclick="completeBill(${b.id})">${b.type==='bill'?'Paid':'Done'}</button>`;
+   return `<div class="task billitem ${b.done?'done':''}">
+    <div>${b.done?'✅':b.type==='bill'?'💳':'🔔'}</div>
+    <div class="txt"><b>${b.name}</b><div style="margin-top:4px">${type}${repeat}${status}</div><div class="tiny">${b.due?fmtDate(b.due):'No due date'}</div>${last}${legacy}</div>
+    <div><div style="text-align:right">${amount}</div><div class="billactions" style="margin-top:6px">${action}<button onclick="deleteBill(${b.id})">Delete</button></div></div>
+   </div>`;
+ }).join('');
+}
+function upcomingBills(days){
+ return state.bills.filter(b=>!b.done&&b.type==='bill'&&b.due&&dayDiff(b.due)>=0&&dayDiff(b.due)<=days);
+}
+function renderMoneyUpcoming(){
+ const el=document.getElementById('moneyUpcoming'); if(!el)return;
+ const seven=upcomingBills(7);
+ const thirty=upcomingBills(30);
+ const overdue=state.bills.filter(b=>!b.done&&b.type==='bill'&&b.due&&dayDiff(b.due)<0);
+ const sum=a=>a.reduce((s,b)=>s+(b.amount||0),0);
+ document.getElementById('money7Total').textContent=money(sum(seven));
+ document.getElementById('money7Count').textContent=seven.length;
+ document.getElementById('moneyOverdue').textContent=money(sum(overdue));
+ document.getElementById('moneyMonth').textContent=money(sum(thirty));
+ const display=overdue.concat(seven).sort((a,b)=>a.due.localeCompare(b.due));
+ if(!display.length){el.innerHTML='<div class="tiny">Nothing due in the next 7 days. 💛</div>';return}
+ el.innerHTML=display.map(b=>`<div class="task">
+   <div class="txt"><b>${b.name}</b><div class="tiny">${billStatusText(b)} • ${fmtDate(b.due)}${b.repeat==='monthly'?' • monthly':''}</div></div>
+   <div class="amount">${b.amount!=null?money(b.amount):'—'}</div>
+   <button class="primary" onclick="completeBill(${b.id})">Paid</button>
+ </div>`).join('');
+}
+
 function addSimple(key,inputId,listId){let v=document.getElementById(inputId).value.trim();if(!v)return;state[key].push({id:Date.now(),text:v,done:false});document.getElementById(inputId).value='';render()}
 function renderSimple(key,listId){document.getElementById(listId).innerHTML=state[key].map(x=>`<div class="task ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleSimple('${key}',${x.id},this.checked)"><div class="txt">${x.text}</div></div>`).join('')}
 function toggleSimple(key,id,done){let x=state[key].find(a=>a.id===id);x.done=done;save();renderSimple(key,key==='groceries'?'groceryList':'supplyList')}
@@ -303,7 +491,7 @@ function renderMeals(){document.getElementById('mealGrid').innerHTML=days.map(d=
 function fillEasyMeals(){let ideas=['Tacos / taco bowls','Sheet-pan chicken','Breakfast for dinner','Pasta + salad','Rotisserie chicken + sides','Soup + sandwiches','Leftovers / fend-for-yourself'];days.forEach((d,i)=>state.meals[d]=ideas[i]);render();save()}
 function clearMeals(){state.meals={};render();save()}
 function saveText(id){state[id]=document.getElementById(id).value;save()}
-function loadText(){['petNotes','billNotes','brainDump','priority1','priority2','priority3'].forEach(id=>{if(state[id])document.getElementById(id).value=state[id]})}
+function loadText(){['petNotes','brainDump','priority1','priority2','priority3'].forEach(id=>{if(state[id]&&document.getElementById(id))document.getElementById(id).value=state[id]})}
 
 const packs={
  college:['Laptop / charger','Student ID / wallet','Medications','Class materials','Laundry / clothes','Toiletries','Dorm supplies','Important forms / documents','Anything to send back to UT Martin'],
@@ -313,7 +501,7 @@ const packs={
 function loadPack(type){let titles={college:'🎓 Brooke / UT Martin',horse:'🐴 Horse Show',trip:'🚗 Trip'};document.getElementById('packTitle').textContent=titles[type];document.getElementById('packList').innerHTML=packs[type].map(x=>`<label class="task"><input type="checkbox"><div class="txt">${x}</div></label>`).join('')}
 
 function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;document.getElementById('wins').textContent=w;document.getElementById('minutes').textContent=m;document.getElementById('progressFill').style.width=Math.min(100,w/5*100)+'%';document.getElementById('goalText').textContent=w>=5?'You reached today’s goal. Anything else is bonus.':`${w} of 5 little wins — five is enough.`}
-function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();save()}
+function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderBills();renderMoneyUpcoming();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();save()}
 
 message();render();updateTimer();loadText();
 </script>
