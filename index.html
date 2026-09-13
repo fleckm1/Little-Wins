@@ -125,7 +125,10 @@ border-radius:16px;padding:12px 14px;margin-top:12px;font-weight:750;border-left
 
 
 
-<style id="v724-clean-final">
+
+
+
+<style id="v725-hero-polish">
 :root{
  --sage:#6f9483; --sage-dark:#355b50; --cream:#fffaf2; --cream2:#f8f2e9;
  --ink:#25483f;
@@ -133,8 +136,8 @@ border-radius:16px;padding:12px 14px;margin-top:12px;font-weight:750;border-left
 body{background:#f8f2e9!important}
 .app{max-width:760px;margin:auto;padding:10px 12px 110px}
 header{
- min-height:300px!important;
- padding:18px!important;
+ min-height:265px!important;
+ padding:16px 16px 16px!important;
  display:flex!important;
  flex-direction:column!important;
  justify-content:center!important;
@@ -145,34 +148,38 @@ header{
  border-radius:28px!important;
  margin-bottom:12px!important;
  background:
-   linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,248,238,.08) 56%,rgba(255,250,242,.70)),
-   url('little-wins-sunrise.jpg') center 52%/cover no-repeat!important;
+   linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,248,238,.08) 54%,rgba(255,250,242,.72)),
+   url('little-wins-sunrise.jpg') center 43%/cover no-repeat!important;
+ background-color:#f8f2e9!important;
  box-shadow:0 8px 26px rgba(69,57,47,.08)!important;
 }
-header::before,header::after{content:none!important;display:none!important}
+header::before,header::after{content:none!important;display:none!important;background:none!important}
 header .tiny{
- position:absolute!important;top:14px!important;left:16px!important;
+ position:absolute!important;top:12px!important;left:15px!important;
  font-size:12px!important;color:#486258!important
 }
 header h1{
- margin:26px 0 8px!important;
+ margin:24px 0 6px!important;
  font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive!important;
- font-size:44px!important;line-height:1!important;font-weight:500!important;
- color:#214e43!important;text-shadow:0 1px 10px rgba(255,255,255,.9)!important
+ font-size:42px!important;line-height:1!important;font-weight:500!important;
+ color:#214e43!important;text-shadow:0 1px 10px rgba(255,255,255,.92)!important
 }
 header .sub{
- font-size:16px!important;line-height:1.35!important;color:#25483f!important;
+ font-size:15.5px!important;line-height:1.32!important;color:#25483f!important;
  max-width:560px!important;font-weight:650!important;
  text-shadow:0 1px 8px rgba(255,255,255,.92)!important
 }
 .heroquote{
- max-width:520px!important;margin:16px auto 0!important;
- border:0!important;border-radius:22px!important;
- background:rgba(255,250,241,.94)!important;
+ width:calc(100% - 40px)!important;
+ max-width:500px!important;
+ box-sizing:border-box!important;
+ margin:14px auto 0!important;
+ border:0!important;border-radius:20px!important;
+ background:rgba(255,250,241,.95)!important;
  box-shadow:0 8px 24px rgba(67,54,42,.10)!important;
- padding:13px 18px!important;
+ padding:12px 16px!important;
  font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive!important;
- font-size:20px!important;color:#365c51!important
+ font-size:19px!important;color:#365c51!important
 }
 .card{
  background:rgba(255,252,247,.96)!important;
@@ -207,7 +214,7 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.2.4</div>
+ <div class="tiny">Little Wins V7.2.5</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
