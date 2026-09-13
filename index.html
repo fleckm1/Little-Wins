@@ -17,10 +17,18 @@
  --green:#7e9b82;--shadow:0 8px 24px rgba(60,50,45,.08)
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-.app{max-width:930px;margin:auto;padding:14px 14px 100px}
-header{background:linear-gradient(135deg,#edf3ef,#f6e9df);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin-bottom:12px}
-h1{margin:0 0 4px;font-size:30px} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:0 0 8px}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+background:
+ linear-gradient(rgba(247,243,238,.68),rgba(247,243,238,.94) 360px),
+ url('little-wins-sunrise.jpg') center top/cover fixed no-repeat;
+color:var(--ink)}
+.app{max-width:930px;margin:auto;padding:14px 14px 110px}
+header{min-height:300px;background:
+ linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.78)),
+ url('little-wins-sunrise.jpg') center/cover no-repeat;
+border-radius:28px;padding:22px;box-shadow:var(--shadow);margin-bottom:12px;
+display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+h1{margin:0 0 4px;font-size:34px;text-shadow:0 1px 8px rgba(255,255,255,.65)} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:0 0 8px}
 .sub{color:var(--muted);line-height:1.45}.tiny{font-size:13px;color:var(--muted)}
 .card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;border:1px solid rgba(0,0,0,.02)}
 .row{display:flex;gap:8px;flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:8px}
@@ -79,6 +87,38 @@ textarea{min-height:72px}
  .billactions{grid-column:1/-1;justify-content:flex-start}
 }
 
+
+.donebtn{font-weight:800;min-width:78px}
+.undobtn{font-weight:700;min-width:78px}
+.task.done{opacity:.58}
+.task.done .txt{text-decoration:line-through}
+
+.completedToday summary{cursor:pointer;font-weight:800}
+.completedrow{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #eee}
+.completedrow:last-child{border-bottom:0}
+.checkmark{font-size:18px}
+.donebtn{font-weight:800;min-width:82px}
+.emptycheck{padding:12px;border:1px dashed #ddd;border-radius:12px;color:var(--muted);text-align:center}
+
+.shortcutgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.shortcut{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+min-height:86px;border-radius:18px;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.8);
+box-shadow:0 6px 18px rgba(60,50,45,.08);font-size:12px;font-weight:750;text-align:center;cursor:pointer}
+.shortcut .ico{font-size:27px}
+.big3row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}
+.nextwin{background:linear-gradient(135deg,#eef5ef,#fff4e7);border:1px solid #e2ddd4;border-radius:20px;padding:16px}
+.nextwin .focus{margin:2px 0 4px}
+.softbtn{background:#fff7ee}
+.deferbtn{background:#f4efe9}
+.tomorrowrow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.heroquote{background:rgba(255,255,255,.80);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+border-radius:16px;padding:12px 14px;margin-top:12px;font-weight:750;border-left:5px solid var(--sage)}
+.survival{background:linear-gradient(135deg,#fff4e7,#f7ebe7)}
+.weekwins{font-size:13px;color:#5e675f;font-weight:700;margin-top:6px}
+@media(max-width:700px){
+ .shortcutgrid{grid-template-columns:repeat(3,1fr)}
+ header{min-height:250px}
+}
 </style>
 </head>
 <body>
@@ -89,13 +129,53 @@ textarea{min-height:72px}
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V6.1</div>
- <h1>Home & Family, Simplified 💛</h1>
- <div class="sub">A home-management app that remembers the routine so you don't have to.</div>
- <div class="encourage" id="message"></div>
+ <div class="tiny">Little Wins V7</div>
+ <h1>Little Wins 💛</h1>
+ <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
+ <div class="heroquote" id="message"></div>
 </header>
 
 <section id="today" class="screen">
+ <div class="card">
+  <h2>🌤️ Quick Access</h2>
+  <div class="shortcutgrid">
+   <div class="shortcut" onclick="showScreen('home')"><span class="ico">🏠</span>Home Tasks</div>
+   <div class="shortcut" onclick="openRoutines()"><span class="ico">❤️</span>Routines</div>
+   <div class="shortcut" onclick="showScreen('family')"><span class="ico">👩‍👧</span>Family</div>
+   <div class="shortcut" onclick="openBills()"><span class="ico">💵</span>Bills</div>
+   <div class="shortcut" onclick="showScreen('meals')"><span class="ico">🛒</span>Groceries</div>
+   <div class="shortcut" onclick="openReminders()"><span class="ico">⭐</span>Reminders</div>
+  </div>
+ </div>
+
+ <div class="card survival">
+  <h2>💛 Just Get Me Through Today</h2>
+  <div class="smallnote">For days when everything feels like too much. Little Wins will narrow your day to three things that are enough.</div>
+  <div class="row" style="margin-top:10px"><button class="primary" onclick="survivalMode()">Give me just 3 things</button></div>
+  <div class="stack" id="survivalList" style="margin-top:10px"></div>
+ </div>
+
+ <div class="card">
+  <h2>⭐ My Big 3</h2>
+  <div class="smallnote">If these three things happen, today counts.</div>
+  <div id="big3List"></div>
+ </div>
+
+ <div class="card">
+  <h2>👉 What should I do next?</h2>
+  <div class="nextwin" id="nextWinBox">
+   <div class="tiny">No decisions required.</div>
+   <div class="focus" id="nextWinText">Tap the button and I'll choose one useful thing.</div>
+   <div class="tiny" id="nextWinMeta"></div>
+   <div class="row" style="margin-top:10px">
+    <button class="primary" onclick="chooseNextWin()">Choose for me</button>
+    <button id="nextWinDone" style="display:none" onclick="completeNextWin()">✓ Done</button>
+    <button id="nextWinLater" class="deferbtn" style="display:none" onclick="deferNextWin()">Not today</button>
+    <button id="nextWinAnother" class="softbtn" style="display:none" onclick="chooseNextWin()">Something else</button>
+   </div>
+  </div>
+ </div>
+
  <div class="card">
   <h2>✨ Plan My Day</h2>
   <div class="grid">
@@ -113,6 +193,15 @@ textarea{min-height:72px}
  <div class="card">
   <h2>📆 Due Today</h2>
   <div class="stack" id="dueToday"></div>
+ </div>
+
+ <div class="card completedToday"><details><summary>✅ Completed Today <span class="tiny" id="completedCount"></span></summary><div class="smallnote" style="margin:8px 0 10px">Finished items disappear from your active checklists, but your wins stay visible here.</div><div id="completedToday"></div></details></div>
+
+ <div class="card">
+  <h2>🌙 Tomorrow Me</h2>
+  <div class="smallnote">What could you do tonight that would make tomorrow a little easier?</div>
+  <div class="tomorrowrow" style="margin-top:10px"><input id="tomorrowInput" placeholder="Pack a bag, thaw dinner, set out clothes…"><button class="primary" onclick="addTomorrowItem()">Add</button></div>
+  <div class="stack" id="tomorrowList" style="margin-top:10px"></div>
  </div>
 
  <div class="card">
@@ -149,9 +238,9 @@ textarea{min-height:72px}
  </div>
 
  <div class="card">
-  <h2>🔁 Automatic Routines</h2>
-  <div class="smallnote" style="margin-bottom:10px">Daily routines automatically reset each new day. Weekly routines reset on their scheduled weekday. Once you set them up, you can simply check them off.</div>
-  <div class="stack" id="routineList"></div>
+  <h2>✅ Today’s Recurring Checklist</h2>
+  <div class="smallnote" style="margin-bottom:10px">Tap ✓ Done and the task disappears for today. Daily routines return tomorrow; weekly routines return on their next scheduled day.</div>
+  <div class="stack" id="routineList"></div><details style="margin-top:10px"><summary class="tiny" style="cursor:pointer">Manage all recurring routines</summary><div class="stack" id="routineManager" style="margin-top:8px"></div></details>
   <div class="addrow" style="margin-top:10px">
    <input id="routineName" placeholder="Routine">
    <select id="routineFrequency"><option value="daily">Every day</option><option value="weekly">Weekly</option></select>
@@ -221,7 +310,18 @@ textarea{min-height:72px}
 </div></div>
 
 <script>
-const encouragement=["Do the task that gives you the most relief per minute.","Future-you deserves help, not a lecture.","If you are tired, choose maintenance over improvement.","One finished task is better than ten half-started ones.","Your home is allowed to look lived in.","Choose the next right thing, not every right thing.","Little wins still count on hard days."];
+const encouragement=[
+"You do not have to catch up on your whole life today.",
+"Good enough is a completely valid finish line.",
+"Do the thing that gives you the most relief per minute.",
+"Future-you needs help, not perfection.",
+"If today is a survival day, maintenance is success.",
+"One finished thing is still progress.",
+"Your home is allowed to look like people live here.",
+"You are allowed to choose what does not get done today.",
+"Done. Let that one go. 💛",
+"Little by little, a lot happens."
+];
 
 const seedTasks=[
 ['Kitchen','Clear and wipe one counter',5,2],['Kitchen','Load or unload dishwasher',10,3],['Kitchen','Throw away expired food from one fridge shelf',10,2],
@@ -244,6 +344,9 @@ if(!state.routines)state.routines=[
 ];
 if(!state.assignments)state.assignments=[]; if(!state.groceries)state.groceries=[]; if(!state.supplies)state.supplies=[]; if(!state.meals)state.meals={};
 if(!state.bills)state.bills=[];
+if(!state.big3)state.big3=[{text:'',done:false},{text:'',done:false},{text:'',done:false}];
+if(!state.tomorrowItems)state.tomorrowItems=[];
+if(!state.winLog)state.winLog=[];
 if(state.billNotes && !state.billNotesMigrated){
   state.bills.push({id:Date.now(),name:'Previous Bills / Reminders notes',type:'reminder',amount:null,due:'',repeat:'none',done:false,legacyNote:state.billNotes,lastCompleted:''});
   state.billNotesMigrated=true;
@@ -257,14 +360,18 @@ function localISODate(d){
  return `${y}-${m}-${day}`;
 }
 const todayISO=localISODate(now), todayName=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
-if(!state.today||state.today.date!==todayISO)state.today={date:todayISO,wins:0,minutes:0};
+if(!state.today||state.today.date!==todayISO){
+ state.today={date:todayISO,wins:0,minutes:0};
+ state.big3=(state.big3||[]).map(x=>({text:x.text||'',done:false}));
+}
+state.tomorrowItems.forEach(x=>{if(x.targetDate<=todayISO)x.active=true});
 
 function autoResetRoutines(){
  state.routines.forEach(r=>{
    if(r.frequency==='daily'){
-     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+     if(r.lastReset!==todayISO){r.done=false;r.completedDate='';r.lastReset=todayISO}
    } else if(r.frequency==='weekly' && r.day===todayName){
-     if(r.lastReset!==todayISO){r.done=false;r.lastReset=todayISO}
+     if(r.lastReset!==todayISO){r.done=false;r.completedDate='';r.lastReset=todayISO}
    }
  });
  save();
@@ -274,6 +381,14 @@ autoResetRoutines();
 let room='All',seconds=300,chosenMinutes=5,ticking=null,currentTask=null;
 
 function save(){localStorage.setItem('littleWinsV5',JSON.stringify(state))}
+function logWin(text,kind){
+ state.winLog.push({id:Date.now()+Math.random(),date:todayISO,text:text,kind:kind});
+ if(state.winLog.length>500)state.winLog=state.winLog.slice(-500);
+}
+function nextLocalDate(){
+ const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,12);
+ return localISODate(d);
+}
 function showScreen(id){
   var map={today:'navToday',home:'navHome',meals:'navMeals',family:'navFamily',lists:'navLists'};
   var radio=document.getElementById(map[id]);
@@ -293,21 +408,23 @@ function pickTask(){let pool=state.tasks.filter(t=>!t.done&&t.min<=chosenMinutes
 function dueCandidates(){
  let arr=[];
  state.routines.forEach(r=>{
-   if(!r.done && (r.frequency==='daily'||r.day===todayName)) arr.push({id:'r'+r.id,text:r.name,room:`${r.owner} • recurring`,min:r.name.toLowerCase().includes('barn')?15:10,priority:3,type:'routine',sourceId:r.id});
+   if(!r.done && r.skipDate!==todayISO && (r.frequency==='daily'||r.day===todayName)) arr.push({id:'r'+r.id,text:r.name,room:`${r.owner} • recurring`,min:r.name.toLowerCase().includes('barn')?15:10,priority:3,type:'routine',sourceId:r.id});
  });
  state.assignments.forEach(a=>{
-   if(!a.done && a.due && a.due<=todayISO) arr.push({id:'a'+a.id,text:a.text,room:`${a.owner} • due`,min:10,priority:3,type:'assignment',sourceId:a.id});
+   if(!a.done && a.deferDate!==todayISO && a.due && a.due<=todayISO) arr.push({id:'a'+a.id,text:a.text,room:`${a.owner} • due`,min:10,priority:3,type:'assignment',sourceId:a.id});
  });
  state.bills.forEach(b=>{
-   if(!b.done && b.due && b.due<=todayISO) arr.push({id:'b'+b.id,text:(b.type==='bill'?'Pay ':'Handle ')+b.name,room:`${b.type==='bill'?'Bill':'Reminder'} • ${billStatusText(b)}`,min:5,priority:3,type:'bill',sourceId:b.id});
+   if(!b.done && b.deferDate!==todayISO && b.due && b.due<=todayISO) arr.push({id:'b'+b.id,text:(b.type==='bill'?'Pay ':'Handle ')+b.name,room:`${b.type==='bill'?'Bill':'Reminder'} • ${billStatusText(b)}`,min:5,priority:3,type:'bill',sourceId:b.id});
  });
+ state.tomorrowItems.forEach(x=>{if(!x.done && x.active)arr.push({id:'tm'+x.id,text:x.text,room:'Tomorrow Me',min:5,priority:3,type:'tomorrow',sourceId:x.id})});
  return arr;
 }
 function renderDueToday(){
  let items=dueCandidates(),el=document.getElementById('dueToday');
- if(!items.length){el.innerHTML='<div class="tiny">Nothing recurring or assigned is due today.</div>';return}
- el.innerHTML=items.map(x=>`<div class="task todayroutine"><div class="txt"><b>${x.text}</b><div class="tiny">${x.room}</div></div><button onclick="quickFocus('${x.text.replace(/'/g,"\\'")}',${x.min})">Start</button></div>`).join('');
+ if(!items.length){el.innerHTML='<div class="emptycheck">🎉 Your due-today checklist is clear.</div>';return}
+ el.innerHTML=items.map(x=>`<div class="task todayroutine"><div class="txt"><b>${x.text}</b><div class="tiny">${x.room}</div></div><button onclick="quickFocus('${x.text.replace(/'/g,"\\'")}',${x.min})">Start</button><button class="primary donebtn" onclick="completeDueItem('${x.type}',${x.sourceId})">✓ ${x.type==='bill'?'Paid':'Done'}</button></div>`).join('');
 }
+function completeDueItem(type,id){if(type==='routine')toggleRoutine(id,true);else if(type==='assignment')toggleAssignment(id,true);else if(type==='bill')completeBill(id);else if(type==='tomorrow')completeTomorrowItem(id)}
 function planMyDay(){
  let max=parseInt(document.getElementById('planTime').value),energy=document.getElementById('planEnergy').value;
  let candidates=dueCandidates();
@@ -334,12 +451,14 @@ function modePlan(mode){
 
 function rooms(){return ['All','Kitchen','Living Room','Bedroom','Bathroom','Laundry','Organizing','Paperwork','Whole House']}
 function renderTabs(){document.getElementById('tabs').innerHTML=rooms().map(r=>`<button class="${r===room?'active':''}" onclick="room='${r}';renderTasks();renderTabs()">${r}</button>`).join('')}
-function renderTasks(){let list=state.tasks.filter(t=>room==='All'||t.room===room);document.getElementById('taskList').innerHTML=list.map(t=>`<div class="task ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id},this.checked)"><div class="txt">${t.text}<div class="tiny">${t.room} • ${t.min} min • ${t.priority===3?'High':t.priority===1?'Low':'Normal'}</div></div></div>`).join('')}
-function toggleTask(id,done){let t=state.tasks.find(x=>x.id===id);if(done&&!t.done){state.today.wins++;state.today.minutes+=t.min}t.done=done;render()}
+function renderTasks(){let list=state.tasks.filter(t=>!t.done&&t.deferDate!==todayISO&&(room==='All'||t.room===room));document.getElementById('taskList').innerHTML=list.length?list.map(t=>`<div class="task"><div class="txt">${t.text}<div class="tiny">${t.room} • ${t.min} min • ${t.priority===3?'High':t.priority===1?'Low':'Normal'}</div></div><button class="deferbtn" onclick="deferItem('task',${t.id})">Not today</button><button class="primary donebtn" onclick="toggleTask(${t.id},true)">✓ Done</button></div>`).join(''):'<div class="emptycheck">No unfinished tasks in this view. ✨</div>'}
+function toggleTask(id,done){let t=state.tasks.find(x=>x.id===id);if(!t)return;if(done&&!t.done){state.today.wins++;state.today.minutes+=t.min;t.completedDate=todayISO;logWin(t.text,'Home task')}if(!done)t.completedDate='';t.done=done;save();render()}
 function addTask(){let txt=document.getElementById('newTask').value.trim();if(!txt)return;state.tasks.push({id:Date.now(),room:document.getElementById('newRoom').value,text:txt,min:10,priority:parseInt(document.getElementById('newPriority').value),done:false});document.getElementById('newTask').value='';render()}
 
 function renderRoutines(){
- document.getElementById('routineList').innerHTML=state.routines.map(r=>`<div class="task ${r.done?'done':''}"><input type="checkbox" ${r.done?'checked':''} onchange="toggleRoutine(${r.id},this.checked)"><div class="txt"><b>${r.name}</b><div class="tiny">${r.frequency==='daily'?'Every day':r.day+'s'} • ${r.owner} • auto-resets</div></div><button onclick="deleteRoutine(${r.id})">Delete</button></div>`).join('')
+ const due=state.routines.filter(r=>!r.done&&r.skipDate!==todayISO&&(r.frequency==='daily'||r.day===todayName));
+ document.getElementById('routineList').innerHTML=due.length?due.map(r=>`<div class="task"><div class="txt"><b>${r.name}</b><div class="tiny">${r.frequency==='daily'?'Every day':r.day+'s'} • ${r.owner}</div></div><button class="deferbtn" onclick="deferItem('routine',${r.id})">Not today</button><button class="primary donebtn" onclick="toggleRoutine(${r.id},true)">✓ Done</button></div>`).join(''):'<div class="emptycheck">🎉 Today’s recurring checklist is complete.</div>';
+ const mgr=document.getElementById('routineManager');if(mgr)mgr.innerHTML=state.routines.map(r=>`<div class="task"><div class="txt"><b>${r.name}</b><div class="tiny">${r.frequency==='daily'?'Every day':r.day+'s'} • ${r.owner}</div></div><button onclick="deleteRoutine(${r.id})">Delete</button></div>`).join('');
 }
 function addRoutine(){
  let n=document.getElementById('routineName').value.trim();if(!n)return;
@@ -347,12 +466,12 @@ function addRoutine(){
  state.routines.push({id:Date.now(),name:n,frequency:f,day:f==='weekly'?document.getElementById('routineDay').value:'',owner:document.getElementById('routineOwner').value,done:false,lastReset:todayISO});
  document.getElementById('routineName').value='';render()
 }
-function toggleRoutine(id,done){let r=state.routines.find(x=>x.id===id);r.done=done;if(done){state.today.wins++}save();render()}
+function toggleRoutine(id,done){let r=state.routines.find(x=>x.id===id);if(!r)return;if(done&&!r.done){state.today.wins++;r.completedDate=todayISO;logWin(r.name,'Routine')}if(!done)r.completedDate='';r.done=done;save();render()}
 function deleteRoutine(id){state.routines=state.routines.filter(x=>x.id!==id);render()}
 
-function renderAssignments(){document.getElementById('assignmentList').innerHTML=state.assignments.map(a=>`<div class="task ${a.done?'done':''}"><input type="checkbox" ${a.done?'checked':''} onchange="toggleAssignment(${a.id},this.checked)"><div class="txt"><b>${a.text}</b><div class="tiny">${a.owner}${a.due?' • due '+a.due:''}</div></div></div>`).join('')}
+function renderAssignments(){let list=state.assignments.filter(a=>!a.done&&a.deferDate!==todayISO);document.getElementById('assignmentList').innerHTML=list.length?list.map(a=>`<div class="task"><div class="txt"><b>${a.text}</b><div class="tiny">${a.owner}${a.due?' • due '+a.due:''}</div></div><button class="deferbtn" onclick="deferItem('assignment',${a.id})">Not today</button><button class="primary donebtn" onclick="toggleAssignment(${a.id},true)">✓ Done</button></div>`).join(''):'<div class="emptycheck">No open family assignments. ✨</div>'}
 function addAssignment(){let t=document.getElementById('assignTask').value.trim();if(!t)return;state.assignments.push({id:Date.now(),text:t,owner:document.getElementById('assignOwner').value,due:document.getElementById('assignDue').value,done:false});document.getElementById('assignTask').value='';render()}
-function toggleAssignment(id,done){let a=state.assignments.find(x=>x.id===id);a.done=done;if(done)state.today.wins++;save();render()}
+function toggleAssignment(id,done){let a=state.assignments.find(x=>x.id===id);if(!a)return;if(done&&!a.done){state.today.wins++;a.completedDate=todayISO;logWin(a.text,'Assignment')}if(!done)a.completedDate='';a.done=done;save();render()}
 
 
 let billFilter='active';
@@ -426,6 +545,7 @@ function completeBill(id){
  const completed=todayISO;
  if(b.repeat==='monthly' && b.due){
    b.lastCompleted=completed;
+   logWin(b.name,'Bill paid');
    b.due=addMonthsClamped(b.due,1);
    b.done=false;
    celebrate(`${b.name} paid. Next due ${fmtDate(b.due)}.`);
@@ -433,6 +553,7 @@ function completeBill(id){
    b.done=true;
    b.lastCompleted=completed;
    state.today.wins++;
+   logWin(b.name,b.type==='bill'?'Bill paid':'Reminder');
    celebrate(`${b.name} handled. One less thing to carry.`);
  }
  save();render();
@@ -458,8 +579,8 @@ function renderBills(){
    const last=b.lastCompleted?`<div class="tiny">Last completed ${fmtDate(b.lastCompleted)}</div>`:'';
    const legacy=b.legacyNote?`<div class="tiny" style="white-space:pre-wrap;margin-top:4px">${b.legacyNote}</div>`:'';
    const action=b.done
-     ?`<button onclick="reopenBill(${b.id})">Reopen</button>`
-     :`<button class="primary" onclick="completeBill(${b.id})">${b.type==='bill'?'Paid':'Done'}</button>`;
+     ?`<button class="undobtn" onclick="reopenBill(${b.id})">↶ Undo</button>`
+     :`<button class="primary donebtn" onclick="completeBill(${b.id})">${b.type==='bill'?'✓ Paid':'✓ Done'}</button>`;
    return `<div class="task billitem ${b.done?'done':''}">
     <div>${b.done?'✅':b.type==='bill'?'💳':'🔔'}</div>
     <div class="txt"><b>${b.name}</b><div style="margin-top:4px">${type}${repeat}${status}</div><div class="tiny">${b.due?fmtDate(b.due):'No due date'}</div>${last}${legacy}</div>
@@ -485,13 +606,13 @@ function renderMoneyUpcoming(){
  el.innerHTML=display.map(b=>`<div class="task">
    <div class="txt"><b>${b.name}</b><div class="tiny">${billStatusText(b)} • ${fmtDate(b.due)}${b.repeat==='monthly'?' • monthly':''}</div></div>
    <div class="amount">${b.amount!=null?money(b.amount):'—'}</div>
-   <button class="primary" onclick="completeBill(${b.id})">Paid</button>
+   <button class="primary donebtn" onclick="completeBill(${b.id})">✓ Paid</button>
  </div>`).join('');
 }
 
 function addSimple(key,inputId,listId){let v=document.getElementById(inputId).value.trim();if(!v)return;state[key].push({id:Date.now(),text:v,done:false});document.getElementById(inputId).value='';render()}
-function renderSimple(key,listId){document.getElementById(listId).innerHTML=state[key].map(x=>`<div class="task ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="toggleSimple('${key}',${x.id},this.checked)"><div class="txt">${x.text}</div></div>`).join('')}
-function toggleSimple(key,id,done){let x=state[key].find(a=>a.id===id);x.done=done;save();renderSimple(key,key==='groceries'?'groceryList':'supplyList')}
+function renderSimple(key,listId){let list=state[key].filter(x=>!x.done);document.getElementById(listId).innerHTML=list.length?list.map(x=>`<div class="task"><div class="txt">${x.text}</div><button class="primary donebtn" onclick="toggleSimple('${key}',${x.id},true)">✓ Done</button></div>`).join(''):'<div class="emptycheck">All clear. ✨</div>'}
+function toggleSimple(key,id,done){let x=state[key].find(a=>a.id===id);if(!x)return;x.done=done;x.completedDate=done?todayISO:'';if(done)logWin(x.text,key==='groceries'?'Grocery':'Supply');save();render()}
 
 const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 function renderMeals(){document.getElementById('mealGrid').innerHTML=days.map(d=>`<div class="task"><div class="pill">${d.slice(0,3)}</div><input value="${(state.meals[d]||'').replace(/"/g,'&quot;')}" oninput="state.meals['${d}']=this.value;save()" placeholder="Dinner"></div>`).join('')}
@@ -507,8 +628,115 @@ const packs={
 };
 function loadPack(type){let titles={college:'🎓 Brooke / UT Martin',horse:'🐴 Horse Show',trip:'🚗 Trip'};document.getElementById('packTitle').textContent=titles[type];document.getElementById('packList').innerHTML=packs[type].map(x=>`<label class="task"><input type="checkbox"><div class="txt">${x}</div></label>`).join('')}
 
+
+let nextWinCurrent=null;
+
+function openRoutines(){showScreen('home');setTimeout(()=>document.getElementById('routineList')?.scrollIntoView({behavior:'smooth',block:'start'}),120)}
+function openBills(){showScreen('family');setTimeout(()=>document.getElementById('billName')?.scrollIntoView({behavior:'smooth',block:'center'}),120)}
+function openReminders(){showScreen('family');setTimeout(()=>document.getElementById('billList')?.scrollIntoView({behavior:'smooth',block:'center'}),120)}
+
+function renderBig3(){
+ const el=document.getElementById('big3List'); if(!el)return;
+ while(state.big3.length<3)state.big3.push({text:'',done:false});
+ el.innerHTML=state.big3.slice(0,3).map((x,i)=>`<div class="big3row">
+  <input value="${(x.text||'').replace(/"/g,'&quot;')}" ${x.done?'disabled':''} oninput="state.big3[${i}].text=this.value;save()" placeholder="${i+1}. ${i===0?'Most important':i===1?'Would give me relief':'Helpful if possible'}">
+  <button class="${x.done?'':'primary'}" onclick="toggleBig3(${i})">${x.done?'↶ Undo':'✓ Done'}</button>
+ </div>`).join('');
+}
+function toggleBig3(i){
+ const x=state.big3[i]; if(!x||!x.text.trim())return;
+ x.done=!x.done;
+ if(x.done){state.today.wins++;logWin(x.text,'Big 3');celebrate('That counts. Let that one go. 💛')}
+ render();save();
+}
+
+function candidatePool(){
+ let pool=dueCandidates();
+ state.tasks.filter(t=>!t.done&&t.deferDate!==todayISO).forEach(t=>pool.push({id:'t'+t.id,text:t.text,room:t.room,min:t.min,priority:t.priority,type:'task',sourceId:t.id}));
+ return pool;
+}
+function chooseNextWin(){
+ const pool=candidatePool();
+ if(!pool.length){nextWinCurrent=null;document.getElementById('nextWinText').textContent='You are caught up enough for right now. 💛';document.getElementById('nextWinMeta').textContent='';toggleNextWinBtns(false);return}
+ pool.sort((a,b)=>(b.priority||2)-(a.priority||2)||(a.min||10)-(b.min||10));
+ const top=pool.slice(0,Math.min(5,pool.length));
+ nextWinCurrent=top[Math.floor(Math.random()*top.length)];
+ document.getElementById('nextWinText').textContent=nextWinCurrent.text;
+ document.getElementById('nextWinMeta').textContent=`${nextWinCurrent.room||'Little Win'} • about ${nextWinCurrent.min||10} min`;
+ toggleNextWinBtns(true);
+}
+function toggleNextWinBtns(show){
+ ['nextWinDone','nextWinLater','nextWinAnother'].forEach(id=>document.getElementById(id).style.display=show?'inline-block':'none');
+}
+function completeNextWin(){
+ if(!nextWinCurrent)return;
+ const x=nextWinCurrent;
+ if(x.type==='task')toggleTask(x.sourceId,true);
+ else if(x.type==='routine')toggleRoutine(x.sourceId,true);
+ else if(x.type==='assignment')toggleAssignment(x.sourceId,true);
+ else if(x.type==='bill')completeBill(x.sourceId);
+ else if(x.type==='tomorrow')completeTomorrowItem(x.sourceId);
+ nextWinCurrent=null;chooseNextWin();
+}
+function deferNextWin(){if(nextWinCurrent){deferItem(nextWinCurrent.type,nextWinCurrent.sourceId);nextWinCurrent=null;chooseNextWin()}}
+function deferItem(type,id){
+ if(type==='task'){let x=state.tasks.find(v=>v.id===id);if(x)x.deferDate=todayISO}
+ if(type==='routine'){let x=state.routines.find(v=>v.id===id);if(x)x.skipDate=todayISO}
+ if(type==='assignment'){let x=state.assignments.find(v=>v.id===id);if(x)x.deferDate=todayISO}
+ if(type==='bill'){let x=state.bills.find(v=>v.id===id);if(x)x.deferDate=todayISO}
+ if(type==='tomorrow'){let x=state.tomorrowItems.find(v=>v.id===id);if(x)x.deferDate=todayISO}
+ save();render();
+}
+
+function survivalMode(){
+ let pool=candidatePool();
+ pool.sort((a,b)=>(b.priority||2)-(a.priority||2)||(a.min||10)-(b.min||10));
+ let selected=[], kinds=new Set();
+ for(const x of pool){
+  const k=x.type==='task'?'home':x.type;
+  if(selected.length<3 && !kinds.has(k)){selected.push(x);kinds.add(k)}
+ }
+ for(const x of pool){if(selected.length>=3)break;if(!selected.some(y=>y.id===x.id))selected.push(x)}
+ state.survivalPlan=selected.slice(0,3);save();renderSurvival();
+}
+function renderSurvival(){
+ const el=document.getElementById('survivalList');if(!el)return;
+ const a=state.survivalPlan||[];
+ el.innerHTML=a.length?a.map(x=>`<div class="task"><div class="txt"><b>${x.text}</b><div class="tiny">${x.room||'Little Win'} • ~${x.min||10} min</div></div><button onclick="quickFocus('${x.text.replace(/'/g,"\\'")}',${x.min||10})">Start</button></div>`).join(''):'<div class="tiny">Tap the button when you need Little Wins to make the day smaller.</div>';
+}
+
+function addTomorrowItem(){
+ const input=document.getElementById('tomorrowInput'),text=input.value.trim();if(!text)return;
+ state.tomorrowItems.push({id:Date.now(),text:text,targetDate:nextLocalDate(),active:false,done:false});
+ input.value='';save();renderTomorrow();
+}
+function renderTomorrow(){
+ const el=document.getElementById('tomorrowList');if(!el)return;
+ const items=state.tomorrowItems.filter(x=>!x.done);
+ el.innerHTML=items.length?items.map(x=>`<div class="task"><div class="txt"><b>${x.text}</b><div class="tiny">${x.active?'For today':'For tomorrow'}</div></div>${x.active?`<button class="primary donebtn" onclick="completeTomorrowItem(${x.id})">✓ Done</button>`:`<button onclick="deleteTomorrowItem(${x.id})">Remove</button>`}</div>`).join(''):'<div class="tiny">Nothing queued for tomorrow yet.</div>';
+}
+function completeTomorrowItem(id){const x=state.tomorrowItems.find(v=>v.id===id);if(!x)return;x.done=true;state.today.wins++;logWin(x.text,'Tomorrow Me');save();render()}
+function deleteTomorrowItem(id){state.tomorrowItems=state.tomorrowItems.filter(x=>x.id!==id);save();renderTomorrow()}
+
+function weekWinCount(){
+ const d=parseLocalDate(todayISO), day=(d.getDay()+6)%7;
+ const monday=new Date(d);monday.setDate(d.getDate()-day);
+ const start=localISODate(monday);
+ return state.winLog.filter(x=>x.date>=start&&x.date<=todayISO).length;
+}
+
+function renderCompletedToday(){
+ const items=state.winLog.filter(x=>x.date===todayISO);
+ const el=document.getElementById('completedToday'),count=document.getElementById('completedCount');
+ if(count)count.textContent=`(${items.length})`;
+ if(!el)return;
+ el.innerHTML=items.length?`<div class="weekwins">💛 ${weekWinCount()} little wins this week — no streak required.</div>`+
+ items.slice().reverse().map(x=>`<div class="completedrow"><span class="checkmark">✅</span><div><b>${x.text}</b><div class="tiny">${x.kind}</div></div></div>`).join('')
+ :'<div class="tiny">Nothing checked off yet — your first little win will show here.</div>';
+}
+
 function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;document.getElementById('wins').textContent=w;document.getElementById('minutes').textContent=m;document.getElementById('progressFill').style.width=Math.min(100,w/5*100)+'%';document.getElementById('goalText').textContent=w>=5?'You reached today’s goal. Anything else is bonus.':`${w} of 5 little wins — five is enough.`}
-function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderBills();renderMoneyUpcoming();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();save()}
+function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderBills();renderMoneyUpcoming();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();renderCompletedToday();renderBig3();renderSurvival();renderTomorrow();save()}
 
 message();render();updateTimer();loadText();
 </script>

@@ -5,17 +5,19 @@
   "display": "standalone",
   "background_color": "#f7f3ee",
   "theme_color": "#8fa79a",
-  "description": "A gentle home and family management app focused on small wins.",
+  "description": "A gentle daily life app for small wins, home, family, bills and routines.",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
