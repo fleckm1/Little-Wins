@@ -198,6 +198,109 @@ nav label:has(input:checked){color:#31584f}
 }
 </style>
 
+
+<style id="v72-final-polish">
+:root{
+ --sage:#6f9483; --sage-dark:#355b50; --cream:#fffaf2; --cream2:#f8f2e9;
+ --peach:#f3d4c6; --coral:#e99089; --gold:#e7b65a; --blue:#8db7d1; --lav:#a89ac8;
+ --ink:#25483f; --muted:#6f766f; --line:rgba(61,76,68,.12);
+}
+body{
+ background:
+  linear-gradient(180deg,rgba(255,250,242,.16),rgba(248,243,235,.92) 620px),
+  url('little-wins-sunrise.jpg') center top/cover fixed no-repeat!important;
+}
+.app{max-width:760px}
+header{
+ min-height:360px!important;
+ padding:28px 22px 24px!important;
+ justify-content:center!important;
+ align-items:center!important;
+ text-align:center!important;
+ background:
+  linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,248,238,.14) 62%,rgba(255,250,242,.82)),
+  url('little-wins-sunrise.jpg') center 44%/cover no-repeat!important;
+ border-radius:30px!important;
+ position:relative;
+}
+header .tiny{position:absolute;top:16px;left:18px;font-size:13px;color:#486258}
+header h1{
+ font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive!important;
+ font-size:48px!important;
+ line-height:1!important;
+ font-weight:500!important;
+ margin:30px 0 8px!important;
+ color:#214e43!important;
+ text-shadow:0 1px 10px rgba(255,255,255,.8)!important;
+}
+header .sub{
+ font-size:18px!important;line-height:1.4!important;color:#25483f!important;
+ max-width:590px;font-weight:500
+}
+.heroquote{
+ max-width:560px;
+ margin:20px auto 0!important;
+ border:0!important;
+ border-radius:23px!important;
+ background:rgba(255,250,241,.91)!important;
+ box-shadow:0 8px 28px rgba(67,54,42,.10)!important;
+ padding:16px 22px!important;
+ font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive!important;
+ font-size:23px!important;color:#365c51!important
+}
+.card{
+ background:rgba(255,252,247,.93)!important;
+ border:1px solid rgba(255,255,255,.78)!important;
+ border-radius:26px!important;
+ box-shadow:0 8px 26px rgba(69,57,47,.08)!important;
+ backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
+}
+.card h2{color:#31584f!important}
+.shortcutgrid{grid-template-columns:repeat(3,1fr)!important;gap:16px!important}
+.shortcut{
+ min-height:110px!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ font-size:14px!important;color:#46544d!important
+}
+.shortcut .ico{
+ width:62px!important;height:62px!important;border-radius:50%!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ font-size:29px!important;color:#fff!important;border:2px solid rgba(255,255,255,.9)!important;
+ box-shadow:0 5px 14px rgba(70,60,50,.12)!important
+}
+.shortcut:nth-child(1) .ico{background:#77a58d!important}
+.shortcut:nth-child(2) .ico{background:#e98984!important}
+.shortcut:nth-child(3) .ico{background:#86b3d1!important}
+.shortcut:nth-child(4) .ico{background:#75a185!important}
+.shortcut:nth-child(5) .ico{background:#e7b450!important}
+.shortcut:nth-child(6) .ico{background:#a79ac8!important}
+.survival{background:linear-gradient(135deg,rgba(255,245,232,.96),rgba(255,251,245,.96))!important}
+.nextwin{background:linear-gradient(135deg,rgba(237,246,239,.97),rgba(255,246,232,.97))!important}
+button{border-radius:14px!important}
+button.primary,.donebtn{background:#76a16f!important;color:white!important;border-color:#76a16f!important}
+.deferbtn{background:#f6efe7!important}
+.weekwins{
+ background:rgba(236,244,237,.8);border-radius:14px;padding:8px 10px!important;
+ color:#567064!important
+}
+nav{
+ background:rgba(255,252,247,.94)!important;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ border-top:1px solid rgba(80,80,70,.08)
+}
+@media(max-width:700px){
+ .app{padding:10px 12px 110px!important}
+ header{min-height:330px!important;padding:22px 16px!important}
+ header h1{font-size:44px!important;margin-top:28px!important}
+ header .sub{font-size:16px!important}
+ .heroquote{font-size:20px!important;padding:13px 16px!important}
+ .shortcutgrid{gap:8px!important}
+ .shortcut{min-height:96px!important}
+ .shortcut .ico{width:54px!important;height:54px!important;font-size:26px!important}
+ .card{border-radius:23px!important}
+}
+</style>
+
 </head>
 <body>
 <input class="navradio" type="radio" name="nav" id="navToday" checked>
@@ -207,7 +310,7 @@ nav label:has(input:checked){color:#31584f}
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.1</div>
+ <div class="tiny">Little Wins V7.2.2</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
@@ -215,7 +318,7 @@ nav label:has(input:checked){color:#31584f}
 
 <section id="today" class="screen">
  <div class="card">
-  <h2>🌤️ Quick Access</h2>
+  <h2>☀️ Quick Access</h2>
   <div class="shortcutgrid">
    <div class="shortcut" onclick="showScreen('home')"><span class="ico">🏠</span>Home Tasks</div>
    <div class="shortcut" onclick="openRoutines()"><span class="ico">❤️</span>Routines</div>
@@ -228,7 +331,7 @@ nav label:has(input:checked){color:#31584f}
 
  <div class="card survival">
   <h2>💛 Just Get Me Through Today</h2>
-  <div class="smallnote">For days when everything feels like too much. Little Wins will narrow your day to three things that are enough.</div>
+  <div class="smallnote">For days when everything feels like too much. Little Wins will narrow your day to three things that really matter.</div>
   <div class="row" style="margin-top:10px"><button class="primary" onclick="survivalMode()">Give me just 3 things</button></div>
   <div class="stack" id="survivalList" style="margin-top:10px"></div>
  </div>
