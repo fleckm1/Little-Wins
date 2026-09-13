@@ -120,6 +120,84 @@ border-radius:16px;padding:12px 14px;margin-top:12px;font-weight:750;border-left
  header{min-height:250px}
 }
 </style>
+
+<style id="v71-polish">
+:root{
+ --sage:#6f9483; --sage2:#dce9df; --cream:#fffaf1; --peach:#f3d2c4;
+ --gold:#e8b95d; --blue:#8fb8d2; --lav:#a89ac8; --ink:#28483f;
+ --muted:#6d756f; --line:rgba(72,83,75,.12);
+}
+body{
+ background:
+  linear-gradient(rgba(255,250,243,.74),rgba(247,242,234,.95) 620px),
+  url('little-wins-sunrise.jpg') center top/cover fixed no-repeat;
+}
+.app{max-width:760px}
+header{
+ min-height:255px;
+ background:
+  linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,250,242,.30) 58%,rgba(255,250,242,.88)),
+  url('little-wins-sunrise.jpg') center 46%/cover no-repeat;
+ border-radius:30px;
+ padding:22px 24px 20px;
+}
+header h1{
+ font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive;
+ font-size:44px;font-weight:500;line-height:1;color:#28554b;
+ letter-spacing:-1px;text-shadow:0 1px 8px rgba(255,255,255,.75)
+}
+header .sub{font-size:17px;color:#294b42;line-height:1.35}
+.heroquote{
+ align-self:stretch;text-align:center;font-family:"Snell Roundhand","Segoe Script","Brush Script MT",cursive;
+ font-size:21px;font-weight:500;color:#31584f;border-left:0;
+ background:rgba(255,250,241,.90);border:1px solid rgba(255,255,255,.75);
+ box-shadow:0 5px 20px rgba(69,55,42,.08);padding:10px 16px;margin-top:12px
+}
+.card{
+ background:rgba(255,252,247,.91);
+ backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+ border:1px solid rgba(255,255,255,.72);border-radius:25px;
+ box-shadow:0 8px 24px rgba(73,60,48,.08)
+}
+.card h2{color:#31584f}
+.shortcutgrid{grid-template-columns:repeat(3,1fr);gap:14px}
+.shortcut{
+ min-height:102px;background:transparent;border:0;box-shadow:none;
+ font-size:13px;color:#4e554f
+}
+.shortcut .ico{
+ width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+ font-size:28px;color:white;border:2px solid rgba(255,255,255,.9);
+ box-shadow:0 4px 12px rgba(70,60,50,.10)
+}
+.shortcut:nth-child(1) .ico{background:#7da58e}
+.shortcut:nth-child(2) .ico{background:#e99089}
+.shortcut:nth-child(3) .ico{background:#8db7d1}
+.shortcut:nth-child(4) .ico{background:#7da58e}
+.shortcut:nth-child(5) .ico{background:#e9b65d}
+.shortcut:nth-child(6) .ico{background:#a79ac7}
+.survival{background:linear-gradient(135deg,rgba(255,245,232,.94),rgba(255,252,247,.94))}
+.nextwin{background:linear-gradient(135deg,rgba(237,246,239,.95),rgba(255,246,232,.95))}
+.task,.completedrow{border-radius:17px}
+button.primary,.donebtn{background:#79a56f!important;color:white!important;border-color:#79a56f!important}
+.deferbtn{background:#f7efe6!important}
+nav{background:rgba(255,252,247,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+nav label{color:#657069}
+nav label:has(input:checked){color:#31584f}
+#completedToday .completedrow{background:rgba(247,250,246,.84)}
+.weekwins{text-align:center;padding:6px 0 10px;color:#6c7b70}
+@media(max-width:700px){
+ .app{padding:10px 12px 105px}
+ header{min-height:220px;border-radius:25px;padding:18px}
+ header h1{font-size:39px}
+ .heroquote{font-size:19px}
+ .shortcutgrid{grid-template-columns:repeat(3,1fr);gap:6px}
+ .shortcut{min-height:86px}
+ .shortcut .ico{width:50px;height:50px;font-size:25px}
+ .card{border-radius:22px}
+}
+</style>
+
 </head>
 <body>
 <input class="navradio" type="radio" name="nav" id="navToday" checked>
@@ -129,7 +207,7 @@ border-radius:16px;padding:12px 14px;margin-top:12px;font-weight:750;border-left
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7</div>
+ <div class="tiny">Little Wins V7.1</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
