@@ -3,7 +3,7 @@
   "short_name": "Little Wins",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#fffaf2",
+  "background_color": "#f8f2e9",
   "theme_color": "#6f9483",
   "description": "A gentle daily life app for small wins, home, family, bills and routines.",
   "icons": [
