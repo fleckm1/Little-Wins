@@ -233,6 +233,37 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
 }
 </style>
 
+
+<style id="v727-readability-navigation-fix">
+/* V7.2.7: readable hero + reliable deep-link navigation */
+header h1{
+  color:#173f36!important;
+  text-shadow:0 2px 3px rgba(255,255,255,.98),0 0 14px rgba(255,250,240,.95)!important;
+  background:rgba(255,250,241,.46)!important;
+  border-radius:18px!important;
+  padding:5px 16px 7px!important;
+  box-shadow:0 3px 16px rgba(255,250,241,.22)!important;
+}
+header .sub{
+  color:#173f36!important;
+  font-size:17px!important;
+  line-height:1.38!important;
+  font-weight:750!important;
+  background:rgba(255,250,241,.82)!important;
+  border:1px solid rgba(255,255,255,.70)!important;
+  border-radius:16px!important;
+  padding:8px 14px!important;
+  text-shadow:0 1px 2px rgba(255,255,255,.98)!important;
+  box-shadow:0 4px 18px rgba(65,55,45,.08)!important;
+}
+.heroquote{min-height:52px!important;display:flex!important;align-items:center!important;justify-content:center!important;}
+#routineList,#familyAssignmentsSection,#billsRemindersSection,#groceriesSection{scroll-margin-top:18px!important;}
+@media(max-width:700px){
+ header h1{font-size:43px!important;padding:5px 13px 7px!important;}
+ header .sub{font-size:16.5px!important;padding:8px 12px!important;}
+}
+</style>
+
 </head>
 <body>
 <input class="navradio" type="radio" name="nav" id="navToday" checked>
@@ -242,7 +273,7 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.2.6</div>
+ <div class="tiny">Little Wins V7.2.7</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
@@ -784,7 +815,7 @@ function openReminders(){
  scrollToSection('billsRemindersSection');
  const type=document.getElementById('billType');
  if(type){type.value='reminder';type.dispatchEvent(new Event('change'));updateBillTypeUI()}
-}),120)}
+}
 
 function renderBig3(){
  const el=document.getElementById('big3List'); if(!el)return;
