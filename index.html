@@ -273,7 +273,7 @@ header .sub{
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.2.7</div>
+ <div class="tiny">Little Wins V7.2.8</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
@@ -419,7 +419,7 @@ header .sub{
  </div>
 
  <div class="card">
-  <h2>💳 Bills & Reminders</h2>
+  <div id="billsRemindersSection"></div><h2>💳 Bills & Reminders</h2>
   <div class="smallnote">Add a bill or reminder once. Little Wins will keep the due date visible and can automatically roll monthly bills to the next month when paid.</div>
   <div class="billform" style="margin-top:12px">
    <div class="wide"><label class="tiny">Name</label><input id="billName" placeholder="Electric bill, horse board, dentist…"></div>
@@ -447,11 +447,11 @@ header .sub{
 </div>
 
 <div class="bottomnav"><div class="navinner">
-<label class="navbtn" for="navToday"><span>✨</span>Today</label>
-<label class="navbtn" for="navHome"><span>🏠</span>Home</label>
-<label class="navbtn" for="navMeals"><span>🍽️</span>Meals</label>
-<label class="navbtn" for="navFamily"><span>👨‍👩‍👧</span>Family</label>
-<label class="navbtn" for="navLists"><span>📝</span>Lists</label>
+<label class="navbtn" for="navToday" onclick="openTabTop('today')"><span>✨</span>Today</label>
+<label class="navbtn" for="navHome" onclick="openTabTop('home')"><span>🏠</span>Home</label>
+<label class="navbtn" for="navMeals" onclick="openTabTop('meals')"><span>🍽️</span>Meals</label>
+<label class="navbtn" for="navFamily" onclick="openTabTop('family')"><span>👨‍👩‍👧</span>Family</label>
+<label class="navbtn" for="navLists" onclick="openTabTop('lists')"><span>📝</span>Lists</label>
 </div></div>
 
 <script>
@@ -534,11 +534,15 @@ function nextLocalDate(){
  const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,12);
  return localISODate(d);
 }
-function showScreen(id){
+function showScreen(id,scrollTop=true){
   var map={today:'navToday',home:'navHome',meals:'navMeals',family:'navFamily',lists:'navLists'};
   var radio=document.getElementById(map[id]);
   if(radio){ radio.checked=true; }
-  try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  if(scrollTop){ window.scrollTo(0,0); }
+}
+function openTabTop(id){
+  showScreen(id,true);
+  requestAnimationFrame(function(){ window.scrollTo(0,0); });
 }
 function message(){document.getElementById('message').textContent=encouragement[Math.floor(Math.random()*encouragement.length)]}
 function celebrate(t){let b=document.getElementById('celebrate');b.textContent=t;b.style.display='block'}
@@ -782,21 +786,21 @@ function scrollToSection(id){
  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),140);
 }
 function openRoutines(){
- showScreen('home');
- setTimeout(()=>document.getElementById('routineList')?.scrollIntoView({behavior:'smooth',block:'start'}),140);
+ showScreen('home',false);
+ scrollToSection('routineList');
 }
 function openFamilyAssignments(){
- showScreen('family');
+ showScreen('family',false);
  scrollToSection('familyAssignmentsSection');
 }
 function openBills(){
- showScreen('family');
+ showScreen('family',false);
  scrollToSection('billsRemindersSection');
  const type=document.getElementById('billType');
  if(type){type.value='bill';type.dispatchEvent(new Event('change'));updateBillTypeUI()}
 }
 function openGroceries(){
- showScreen('meals');
+ showScreen('meals',false);
  scrollToSection('groceriesSection');
 }
 
@@ -811,7 +815,7 @@ function updateBillTypeUI(){
 }
 
 function openReminders(){
- showScreen('family');
+ showScreen('family',false);
  scrollToSection('billsRemindersSection');
  const type=document.getElementById('billType');
  if(type){type.value='reminder';type.dispatchEvent(new Event('change'));updateBillTypeUI()}
