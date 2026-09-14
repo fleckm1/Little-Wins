@@ -205,6 +205,34 @@ header .sub{
 nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 </style>
 
+
+<style id="v726-navigation-form-fixes">
+/* V7.2.6 targeted polish */
+#familyAssignmentsSection,#groceriesSection,#billsRemindersSection{
+  scroll-margin-top:16px;
+}
+@media(max-width:700px){
+  /* Bill/reminder form */
+  #billName,#billAmount,#billDue,#billType,#billRepeat{
+    width:100%!important;
+    box-sizing:border-box!important;
+  }
+  .billform,.bill-grid,.formgrid{
+    grid-template-columns:1fr!important;
+  }
+  #billAddBtn, button[onclick*="addBill"]{
+    width:100%!important;
+    min-height:48px!important;
+  }
+
+  /* Routine form: stack naturally on phone */
+  #routineName,#routineFrequency,#routineDay,#routineOwner{
+    width:100%!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <input class="navradio" type="radio" name="nav" id="navToday" checked>
@@ -214,7 +242,7 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.2.5</div>
+ <div class="tiny">Little Wins V7.2.6</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
@@ -226,9 +254,9 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
   <div class="shortcutgrid">
    <div class="shortcut" onclick="showScreen('home')"><span class="ico">🏠</span>Home Tasks</div>
    <div class="shortcut" onclick="openRoutines()"><span class="ico">❤️</span>Routines</div>
-   <div class="shortcut" onclick="showScreen('family')"><span class="ico">👩‍👧</span>Family</div>
+   <div class="shortcut" onclick="openFamilyAssignments()"><span class="ico">👩‍👧</span>Family</div>
    <div class="shortcut" onclick="openBills()"><span class="ico">💵</span>Bills</div>
-   <div class="shortcut" onclick="showScreen('meals')"><span class="ico">🛒</span>Groceries</div>
+   <div class="shortcut" onclick="openGroceries()"><span class="ico">🛒</span>Groceries</div>
    <div class="shortcut" onclick="openReminders()"><span class="ico">⭐</span>Reminders</div>
   </div>
  </div>
@@ -330,10 +358,11 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
    <input id="routineName" placeholder="Routine">
    <select id="routineFrequency"><option value="daily">Every day</option><option value="weekly">Weekly</option></select>
    <select id="routineDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
-   <button class="primary" onclick="addRoutine()">Add</button>
+   <select id="routineOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select>
+<button class="primary" onclick="addRoutine()">Add</button>
   </div>
   <div class="row" style="margin-top:8px">
-   <select id="routineOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select>
+   
   </div>
  </div>
 </section>
@@ -341,7 +370,7 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
 <section id="meals" class="screen">
  <div class="card"><h2>🍽️ Meal Plan</h2><div class="stack" id="mealGrid"></div><div class="row" style="margin-top:10px"><button onclick="fillEasyMeals()">Fill easy dinners</button><button onclick="clearMeals()">Clear</button></div></div>
  <div class="grid">
-  <div class="card"><h2>🛒 Groceries</h2><div class="listrow"><input id="groceryInput" placeholder="Add item"><button class="primary" onclick="addSimple('groceries','groceryInput','groceryList')">Add</button></div><div class="stack" id="groceryList" style="margin-top:10px"></div></div>
+  <div class="card"><div id="groceriesSection"></div><h2>🛒 Groceries</h2><div class="listrow"><input id="groceryInput" placeholder="Add item"><button class="primary" onclick="addSimple('groceries','groceryInput','groceryList')">Add</button></div><div class="stack" id="groceryList" style="margin-top:10px"></div></div>
   <div class="card"><h2>🧻 Supplies</h2><div class="listrow"><input id="supplyInput" placeholder="Add item"><button class="primary" onclick="addSimple('supplies','supplyInput','supplyList')">Add</button></div><div class="stack" id="supplyList" style="margin-top:10px"></div></div>
  </div>
 </section>
@@ -353,7 +382,7 @@ nav{background:rgba(255,252,247,.96)!important;backdrop-filter:blur(14px);-webki
  </div>
 
  <div class="card" style="margin-top:12px">
-  <h2>👨‍👩‍👧 Family Assignments</h2>
+  <div id="familyAssignmentsSection"></div><h2>👨‍👩‍👧 Family Assignments</h2>
   <div class="stack" id="assignmentList"></div>
   <div class="addrow" style="margin-top:10px"><input id="assignTask" placeholder="Task"><select id="assignOwner"><option>Me</option><option>Grace</option><option>Brooke</option><option>Family</option></select><input id="assignDue" type="date"><button class="primary" onclick="addAssignment()">Assign</button></div>
  </div>
@@ -716,9 +745,46 @@ function loadPack(type){let titles={college:'🎓 Brooke / UT Martin',horse:'�
 
 let nextWinCurrent=null;
 
-function openRoutines(){showScreen('home');setTimeout(()=>document.getElementById('routineList')?.scrollIntoView({behavior:'smooth',block:'start'}),120)}
-function openBills(){showScreen('family');setTimeout(()=>document.getElementById('billName')?.scrollIntoView({behavior:'smooth',block:'center'}),120)}
-function openReminders(){showScreen('family');setTimeout(()=>document.getElementById('billList')?.scrollIntoView({behavior:'smooth',block:'center'}),120)}
+function scrollToSection(id){
+ const el=document.getElementById(id);
+ if(!el)return;
+ setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),140);
+}
+function openRoutines(){
+ showScreen('home');
+ setTimeout(()=>document.getElementById('routineList')?.scrollIntoView({behavior:'smooth',block:'start'}),140);
+}
+function openFamilyAssignments(){
+ showScreen('family');
+ scrollToSection('familyAssignmentsSection');
+}
+function openBills(){
+ showScreen('family');
+ scrollToSection('billsRemindersSection');
+ const type=document.getElementById('billType');
+ if(type){type.value='bill';type.dispatchEvent(new Event('change'));updateBillTypeUI()}
+}
+function openGroceries(){
+ showScreen('meals');
+ scrollToSection('groceriesSection');
+}
+
+function updateBillTypeUI(){
+ const type=document.getElementById('billType');
+ const amount=document.getElementById('billAmount');
+ if(!type||!amount)return;
+ const wrap=amount.closest('.field')||amount.parentElement;
+ const isReminder=type.value==='reminder';
+ if(wrap)wrap.style.display=isReminder?'none':'';
+ if(isReminder)amount.value='';
+}
+
+function openReminders(){
+ showScreen('family');
+ scrollToSection('billsRemindersSection');
+ const type=document.getElementById('billType');
+ if(type){type.value='reminder';type.dispatchEvent(new Event('change'));updateBillTypeUI()}
+}),120)}
 
 function renderBig3(){
  const el=document.getElementById('big3List'); if(!el)return;
@@ -824,6 +890,7 @@ function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;docume
 function render(){renderTabs();renderTasks();renderRoutines();renderAssignments();renderBills();renderMoneyUpcoming();renderSimple('groceries','groceryList');renderSimple('supplies','supplyList');renderMeals();renderStats();renderDailyPlan();renderDueToday();renderCompletedToday();renderBig3();renderSurvival();renderTomorrow();save()}
 
 message();render();updateTimer();loadText();
+const billTypeEl=document.getElementById('billType');if(billTypeEl){billTypeEl.addEventListener('change',updateBillTypeUI);updateBillTypeUI();}
 </script>
 <script>
 if ("serviceWorker" in navigator) {
