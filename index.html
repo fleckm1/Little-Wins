@@ -59,7 +59,7 @@ textarea{min-height:72px}
 .planitem{display:flex;gap:8px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.planitem:last-child{border-bottom:0}
 .addrow{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:7px}@media(max-width:700px){.addrow{grid-template-columns:1fr}}
 .listrow{display:grid;grid-template-columns:1fr auto;gap:7px}
-.sectiontabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}.sectiontabs button.active{background:var(--sage);color:#fff}
+.sectiontabs{display:flex;gap:8px;flex-wrap:wrap;overflow:visible;padding-bottom:4px;margin-bottom:10px}.sectiontabs button{flex:0 0 auto}.sectiontabs button.active{background:var(--sage);color:#fff}
 .person{padding:13px;border-radius:16px;background:#faf7f3;border:1px solid var(--line)}
 .todayroutine{border-left:5px solid var(--sage)}
 
@@ -273,7 +273,7 @@ header .sub{
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.2.8</div>
+ <div class="tiny">Little Wins V7.2.9</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
@@ -285,7 +285,7 @@ header .sub{
   <div class="shortcutgrid">
    <div class="shortcut" onclick="showScreen('home')"><span class="ico">🏠</span>Home Tasks</div>
    <div class="shortcut" onclick="openRoutines()"><span class="ico">❤️</span>Routines</div>
-   <div class="shortcut" onclick="openFamilyAssignments()"><span class="ico">👩‍👧</span>Family</div>
+   <div class="shortcut" onclick="openFamily()"><span class="ico">👩‍👧</span>Family</div>
    <div class="shortcut" onclick="openBills()"><span class="ico">💵</span>Bills</div>
    <div class="shortcut" onclick="openGroceries()"><span class="ico">🛒</span>Groceries</div>
    <div class="shortcut" onclick="openReminders()"><span class="ico">⭐</span>Reminders</div>
@@ -407,6 +407,7 @@ header .sub{
 </section>
 
 <section id="family" class="screen">
+ <div id="familyTop"></div>
  <div class="grid">
   <div class="person"><h3>🎓 Brooke</h3><div class="sub">18 • College at UT Martin</div><div class="tiny" style="margin-top:8px">Best for occasional family tasks, travel/college reminders, or things she can handle while away.</div></div>
   <div class="person"><h3>🏡 Grace</h3><div class="sub">16 • Lives at home</div><div class="tiny" style="margin-top:8px">Nighttime barn chores are already set as a daily recurring responsibility.</div></div>
@@ -788,6 +789,10 @@ function scrollToSection(id){
 function openRoutines(){
  showScreen('home',false);
  scrollToSection('routineList');
+}
+function openFamily(){
+ showScreen('family',false);
+ scrollToSection('familyTop');
 }
 function openFamilyAssignments(){
  showScreen('family',false);

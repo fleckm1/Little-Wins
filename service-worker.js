@@ -1,4 +1,4 @@
-const CACHE='little-wins-v7-2-8';
+const CACHE='little-wins-v7-2-9';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./little-wins-sunrise.jpg'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(Promise.all([
