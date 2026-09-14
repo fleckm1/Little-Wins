@@ -265,6 +265,22 @@ header .sub{
 }
 </style>
 
+
+<style id="v740-bills-backup">
+/* Cleaner phone-first bill cards */
+.billitem{display:block!important;padding:16px!important}
+.billitem .billicon{display:none!important}
+.billhead{display:block!important}
+.billname{font-size:19px!important;line-height:1.22!important;font-weight:800!important;color:#285548!important;margin-bottom:7px!important}
+.billmeta{display:flex!important;gap:5px!important;flex-wrap:wrap!important;margin-bottom:7px!important}
+.billdate{font-size:14px!important;color:var(--muted)!important;margin:3px 0 9px!important}
+.billamount{font-size:24px!important;font-weight:850!important;color:#285548!important;margin:4px 0 11px!important}
+.billactions{display:flex!important;gap:8px!important;justify-content:flex-start!important;align-items:center!important;flex-wrap:wrap!important}
+.billactions button{min-width:104px!important}
+.backupactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.backupstatus{margin-top:9px;padding:9px 11px;border-radius:12px;background:#f7f3ed;color:var(--muted);font-size:13px;display:none}
+@media(max-width:700px){.billitem{grid-template-columns:1fr!important}.billname{font-size:20px!important}.billamount{font-size:25px!important}}
+</style>
 </head>
 <body>
 <input class="navradio" type="radio" name="nav" id="navToday" checked>
@@ -274,7 +290,7 @@ header .sub{
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.3.1</div>
+ <div class="tiny">Little Wins V7.4.0</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
@@ -445,6 +461,7 @@ header .sub{
  <div class="card"><h2>🧠 Brain Dump</h2><textarea id="brainDump" placeholder="Everything you do not want to keep carrying in your head…" oninput="saveText('brainDump')"></textarea></div>
  <div class="card"><h2>🎒 Packing Lists</h2><div class="row"><button onclick="loadPack('college')">Brooke / College</button><button onclick="loadPack('horse')">Horse Show</button><button onclick="loadPack('trip')">Trip</button></div><div class="focus" id="packTitle" style="font-size:18px">Choose a checklist.</div><div class="stack" id="packList"></div></div>
  <div class="card"><h2>📅 Sunday Top 3</h2><input id="priority1" placeholder="1. Most important" oninput="saveText('priority1')"><input id="priority2" placeholder="2. Important" oninput="saveText('priority2')" style="margin-top:7px"><input id="priority3" placeholder="3. Helpful if possible" oninput="saveText('priority3')" style="margin-top:7px"></div>
+ <div class="card"><h2>💾 Backup & Restore</h2><div class="smallnote">Protect everything you enter in Little Wins — including bills, routines, lists, groceries, and completed wins. Save a backup file somewhere safe, such as Files or iCloud Drive.</div><div class="backupactions"><button class="primary" onclick="backupLittleWins()">Save Backup</button><button onclick="document.getElementById('restoreFile').click()">Restore Backup</button><input id="restoreFile" type="file" accept="application/json,.json" style="display:none" onchange="restoreLittleWins(event)"></div><div id="backupStatus" class="backupstatus"></div></div>
 </section>
 </div>
 
@@ -733,9 +750,15 @@ function renderBills(){
      ?`<button class="undobtn" onclick="reopenBill(${b.id})">↶ Undo</button>`
      :`<button class="primary donebtn" onclick="completeBill(${b.id})">${b.type==='bill'?'✓ Paid':'✓ Done'}</button>`;
    return `<div class="task billitem ${b.done?'done':''}">
-    <div>${b.done?'✅':b.type==='bill'?'💳':'🔔'}</div>
-    <div class="txt"><b>${b.name}</b><div style="margin-top:4px">${type}${repeat}${status}</div><div class="tiny">${b.due?fmtDate(b.due):'No due date'}</div>${last}${legacy}</div>
-    <div><div style="text-align:right">${amount}</div><div class="billactions" style="margin-top:6px">${action}<button onclick="deleteBill(${b.id})">Delete</button></div></div>
+    <div class="billicon">${b.done?'✅':b.type==='bill'?'💳':'🔔'}</div>
+    <div class="billhead">
+      <div class="billname">${b.name}</div>
+      <div class="billmeta">${type}${repeat}${status}</div>
+      <div class="billdate">${b.due?'Due '+fmtDate(b.due):'No due date'}</div>
+      ${b.amount!=null?`<div class="billamount">${money(b.amount)}</div>`:''}
+      ${last}${legacy}
+      <div class="billactions">${action}<button onclick="deleteBill(${b.id})">Delete</button></div>
+    </div>
    </div>`;
  }).join('');
 }
@@ -925,6 +948,38 @@ function renderCompletedToday(){
  el.innerHTML=items.length?`<div class="weekwins">💛 ${weekWinCount()} little wins this week — no streak required.</div>`+
  items.slice().reverse().map(x=>`<div class="completedrow"><span class="checkmark">✅</span><div><b>${x.text}</b><div class="tiny">${x.kind}</div></div></div>`).join('')
  :'<div class="tiny">Nothing checked off yet — your first little win will show here.</div>';
+}
+
+function backupMessage(text){
+ const el=document.getElementById('backupStatus');if(!el)return;el.textContent=text;el.style.display='block';
+}
+function backupLittleWins(){
+ try{
+   save();
+   const payload={app:'Little Wins',version:'7.4.0',exportedAt:new Date().toISOString(),storageKey:'littleWinsV5',data:state};
+   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+   const url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download=`Little-Wins-Backup-${todayISO}.json`;document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+   backupMessage('Backup created. Keep the JSON file in Files or iCloud Drive.');
+ }catch(e){backupMessage('I could not create the backup on this device. Your current Little Wins data has not been changed.');}
+}
+function restoreLittleWins(event){
+ const file=event.target.files&&event.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=function(){
+  try{
+   const parsed=JSON.parse(reader.result),incoming=(parsed&&parsed.data)?parsed.data:parsed;
+   if(!incoming||typeof incoming!=='object'||Array.isArray(incoming))throw new Error('invalid');
+   const billCount=Array.isArray(incoming.bills)?incoming.bills.length:0;
+   if(!confirm(`Restore this Little Wins backup? It contains ${billCount} bill/reminder item${billCount===1?'':'s'} and will replace the data currently stored in this copy of the app.`)){event.target.value='';return;}
+   localStorage.setItem('littleWinsV5',JSON.stringify(incoming));
+   backupMessage('Backup restored. Reloading Little Wins…');
+   setTimeout(()=>location.reload(),350);
+  }catch(e){backupMessage('That file does not look like a valid Little Wins backup. Nothing was changed.');event.target.value='';}
+ };
+ reader.onerror=function(){backupMessage('I could not read that backup file. Nothing was changed.');};
+ reader.readAsText(file);
 }
 
 function renderStats(){let w=state.today.wins||0,m=state.today.minutes||0;document.getElementById('wins').textContent=w;document.getElementById('minutes').textContent=m;document.getElementById('progressFill').style.width=Math.min(100,w/5*100)+'%';document.getElementById('goalText').textContent=w>=5?'You reached today’s goal. Anything else is bonus.':`${w} of 5 little wins — five is enough.`}
