@@ -18,7 +18,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
-.app{max-width:930px;margin:auto;padding:14px 14px 110px}
+.app{max-width:930px;margin:auto;padding:14px 14px calc(150px + env(safe-area-inset-bottom))}
 header{}
 h1{margin:0 0 4px;font-size:34px;text-shadow:0 1px 8px rgba(255,255,255,.65)} h2{font-size:18px;margin:0 0 12px} h3{font-size:15px;margin:0 0 8px}
 .sub{color:var(--muted);line-height:1.45}.tiny{font-size:13px;color:var(--muted)}
@@ -51,7 +51,7 @@ textarea{min-height:72px}
 #navMeals:checked ~ .bottomnav label[for="navMeals"],
 #navFamily:checked ~ .bottomnav label[for="navFamily"],
 #navLists:checked ~ .bottomnav label[for="navLists"]{color:var(--ink);background:#f4f1ed}
-.bottomnav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10;padding-bottom:env(safe-area-inset-bottom)}
 .navinner{width:100%;max-width:930px;display:grid;grid-template-columns:repeat(5,1fr)}
 .navbtn{border-radius:0;background:transparent;padding:10px 4px 9px;font-size:11px;color:var(--muted);text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
 .navbtn span{display:block;font-size:19px;margin-bottom:2px}
@@ -290,7 +290,7 @@ header .sub{
 <input class="navradio" type="radio" name="nav" id="navLists">
 <div class="app">
 <header>
- <div class="tiny">Little Wins V7.4.0</div>
+ <div class="tiny">Little Wins V7.4.1</div>
  <h1>Little Wins 💛</h1>
  <div class="sub"><b>You do not have to do it all today.</b><br>Just make the next thing a little easier.</div>
  <div class="heroquote" id="message"></div>
